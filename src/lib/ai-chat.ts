@@ -125,18 +125,18 @@ export class StockAnalysisChat {
         )}\n`;
       }
 
-                   if (socialSentiment.recentTweets.length > 0) {
-               prompt += `- Recent Sentiment Examples:\n`;
-               socialSentiment.recentTweets.slice(0, 3).forEach((tweet, index) => {
-                 prompt += `  ${
-                   index + 1
-                 }. [${tweet.sentiment.toUpperCase()}] ${tweet.text.substring(
-                   0,
-                   100
-                 )}${tweet.text.length > 100 ? "..." : ""}\n`;
-               });
-             }
-             prompt += `- Engagement Metrics: Average likes, retweets, and replies from analyzed tweets\n`;
+      if (socialSentiment.recentTweets.length > 0) {
+        prompt += `- Recent Sentiment Examples:\n`;
+        socialSentiment.recentTweets.slice(0, 3).forEach((tweet, index) => {
+          prompt += `  ${
+            index + 1
+          }. [${tweet.sentiment.toUpperCase()}] ${tweet.text.substring(
+            0,
+            100
+          )}${tweet.text.length > 100 ? "..." : ""}\n`;
+        });
+      }
+      prompt += `- Engagement Metrics: Average likes, retweets, and replies from analyzed tweets\n`;
       prompt += "\n";
     } else {
       console.log(
