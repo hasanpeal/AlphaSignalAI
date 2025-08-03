@@ -1,4 +1,4 @@
-import { ChatDeepSeek } from "@langchain/deepseek";
+import { ChatGroq } from "@langchain/groq";
 import { HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
 import { StockData } from "./twelve-data";
 
@@ -9,18 +9,18 @@ export interface ChatMessage {
 }
 
 export class StockAnalysisChat {
-  private model: ChatDeepSeek;
+  private model: ChatGroq;
   private conversationHistory: BaseMessage[] = [];
 
   constructor() {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      throw new Error("DEEPSEEK_API_KEY is required");
+      throw new Error("GROQ_API_KEY is required");
     }
 
-    this.model = new ChatDeepSeek({
+    this.model = new ChatGroq({
       apiKey,
-      model: "deepseek-chat",
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
       temperature: 0.7,
     });
   }
@@ -198,13 +198,27 @@ Remember: Past performance doesn't guarantee future results. Always emphasize th
     const systemPrompt = this.createSystemPrompt();
     const stockDataPrompt = this.formatStockDataForPrompt(stockData);
 
+    // Create messages with conversation history
+    const messages: BaseMessage[] = [];
+
+    // Add conversation history if available
+    if (this.conversationHistory.length > 0) {
+      messages.push(...this.conversationHistory);
+    }
+
+    // Add current context and question
     const fullPrompt = `${systemPrompt}\n\n${stockDataPrompt}\n\nUSER QUESTION: ${userQuestion}\n\nPlease provide a comprehensive analysis and answer to the user's question.`;
+    messages.push(new HumanMessage(fullPrompt));
 
-    console.log(fullPrompt);
+    console.log(
+      `🤖 [AI Chat] Sending request with ${messages.length} messages (${this.conversationHistory.length} from history)`
+    );
+
     try {
-      const response = await this.model.invoke([new HumanMessage(fullPrompt)]);
-
+      const response = await this.model.invoke(messages);
       const aiMessage = new AIMessage(response.content as string);
+
+      // Update conversation history
       this.conversationHistory.push(new HumanMessage(userQuestion), aiMessage);
 
       return response.content as string;
@@ -216,10 +230,25 @@ Remember: Past performance doesn't guarantee future results. Always emphasize th
 
   async continueConversation(userMessage: string): Promise<string> {
     try {
-      const messages = [
-        ...this.conversationHistory,
-        new HumanMessage(userMessage),
-      ];
+      // For follow-up questions, we need to include the system prompt
+      const systemPrompt = this.createSystemPrompt();
+
+      const messages: BaseMessage[] = [];
+
+      // Add system prompt first
+      messages.push(new HumanMessage(systemPrompt));
+
+      // Add conversation history
+      if (this.conversationHistory.length > 0) {
+        messages.push(...this.conversationHistory);
+      }
+
+      // Add the follow-up question
+      messages.push(new HumanMessage(userMessage));
+
+      console.log(
+        `🤖 [AI Chat] Continuing conversation with ${messages.length} messages (${this.conversationHistory.length} from history)`
+      );
 
       const response = await this.model.invoke(messages);
 

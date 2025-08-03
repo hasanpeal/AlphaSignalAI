@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { StockAnalysisChat } from "@/lib/ai-chat";
 import { twelveDataAPI } from "@/lib/twelve-data";
+import { conversationStore } from "@/lib/conversation-store";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message, symbol, isNewConversation } = body;
+    const { message, symbol, isNewConversation, sessionId } = body;
 
     if (!message) {
       return NextResponse.json(
@@ -14,20 +14,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const chat = new StockAnalysisChat();
+    // Generate session ID if not provided
+    const currentSessionId = sessionId || `session_${Date.now()}`;
+
+    // Get or create conversation session
+    const chat = conversationStore.getOrCreateSession(currentSessionId);
 
     let response: string;
 
     if (symbol && isNewConversation) {
+      // Clear previous conversation for new stock analysis
+      conversationStore.clearSession(currentSessionId);
+      const newChat = conversationStore.getOrCreateSession(currentSessionId);
+
       // Get stock data and analyze
       const stockData = await twelveDataAPI.getStockData(symbol);
-      response = await chat.analyzeStock(message, stockData);
+      response = await newChat.analyzeStock(message, stockData);
     } else {
       // Continue existing conversation
       response = await chat.continueConversation(message);
     }
 
-    return NextResponse.json({ response });
+    return NextResponse.json({ response, sessionId: currentSessionId });
   } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(

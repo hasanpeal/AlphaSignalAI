@@ -44,8 +44,8 @@ Create a `.env.local` file in the root directory:
 # Twelve Data API Key
 TWELVE_DATA_API_KEY=your_twelve_data_api_key_here
 
-# DeepSeek API Key
-DEEPSEEK_API_KEY=your_deepseek_api_key_here
+# Groq API Key (for fast AI responses)
+GROQ_API_KEY=your_groq_api_key_here
 
 # Scraper.tech API Key (for social sentiment analysis)
 SCRAPER_API_KEY=your_scraper_api_key_here
@@ -60,11 +60,12 @@ SCRAPER_API_KEY=your_scraper_api_key_here
 3. Get your API key from the dashboard
 4. Add it to your `.env.local` file
 
-#### DeepSeek API
+#### Groq API (for fast AI responses)
 
-1. Visit [https://platform.deepseek.com](https://platform.deepseek.com)
+1. Visit [https://console.groq.com](https://console.groq.com)
 2. Create an account and get your API key
 3. Add it to your `.env.local` file
+4. This provides fast responses using Llama3-8B model (fastest and cheapest option)
 
 #### Scraper.tech API (Optional - for social sentiment analysis)
 

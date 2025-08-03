@@ -19,6 +19,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -53,6 +54,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
           message: inputMessage,
           symbol: selectedStock,
           isNewConversation: messages.length === 0,
+          sessionId: sessionId,
         }),
       });
 
@@ -60,6 +62,11 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
 
       if (data.error) {
         throw new Error(data.error);
+      }
+
+      // Update session ID if provided
+      if (data.sessionId) {
+        setSessionId(data.sessionId);
       }
 
       const assistantMessage: Message = {
@@ -93,6 +100,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
 
   const clearChat = () => {
     setMessages([]);
+    setSessionId(""); // Clear session when clearing chat
   };
 
   const formatTime = (date: Date) => {
