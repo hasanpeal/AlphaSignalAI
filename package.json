@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/community": "^0.3.49",
+    "@langchain/core": "^0.3.66",
     "@langchain/deepseek": "^0.1.0",
+    "@langchain/groq": "^0.2.3",
     "axios": "^1.11.0",
     "langchain": "^0.3.30",
     "lucide-react": "^0.536.0",

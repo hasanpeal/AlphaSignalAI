@@ -26,7 +26,7 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Bot className="w-4 h-4" />
-                <span>Powered by DeepSeek AI</span>
+                <span>Powered by Groq AI (Llama3-8B)</span>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function Home() {
               </h3>
             </div>
             <p className="text-gray-600 text-sm">
-              DeepSeek AI provides comprehensive analysis and investment
+              Groq AI provides fast, comprehensive analysis and investment
               insights based on technical and fundamental data.
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-sm text-gray-500">
             <p>Stock Pilot - AI-Powered Stock Analysis Tool</p>
-            <p className="mt-2">Powered by Twelve Data API and DeepSeek AI</p>
+            <p className="mt-2">Powered by Twelve Data API and Groq AI</p>
             <p className="mt-2 text-xs">
               This tool is for educational purposes only. Not financial advice.
             </p>
