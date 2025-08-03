@@ -1,4 +1,5 @@
 import axios from "axios";
+import { socialSentimentAPI, SocialSentiment } from "./social-sentiment";
 
 const TWELVE_DATA_BASE_URL = "https://api.twelvedata.com";
 
@@ -51,6 +52,7 @@ export interface StockData {
     macd: TechnicalIndicator[] | null;
     bollingerBands: TechnicalIndicator[] | null;
   };
+  socialSentiment?: SocialSentiment;
 }
 
 class TwelveDataAPI {
@@ -177,10 +179,32 @@ class TwelveDataAPI {
         this.getTechnicalIndicators(symbol),
       ]);
 
+      // Get social sentiment in parallel (non-blocking)
+      let socialSentiment: SocialSentiment | undefined;
+      console.log(
+        `🔄 [Twelve Data] Fetching social sentiment for ${symbol} (${quote.name})`
+      );
+      try {
+        socialSentiment = await socialSentimentAPI.getStockSentiment(
+          symbol,
+          quote.name
+        );
+        console.log(
+          `✅ [Twelve Data] Social sentiment fetched successfully for ${symbol}`
+        );
+      } catch (error) {
+        console.error(
+          `❌ [Twelve Data] Error fetching social sentiment for ${symbol}:`,
+          error
+        );
+        // Don't fail the entire request if sentiment fails
+      }
+
       return {
         quote,
         timeSeries,
         technicalIndicators,
+        socialSentiment,
       };
     } catch (error) {
       console.error("Error fetching stock data:", error);

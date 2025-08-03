@@ -46,6 +46,9 @@ TWELVE_DATA_API_KEY=your_twelve_data_api_key_here
 
 # DeepSeek API Key
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
+
+# Scraper.tech API Key (for social sentiment analysis)
+SCRAPER_API_KEY=your_scraper_api_key_here
 ```
 
 ### 3. Get API Keys
@@ -62,6 +65,13 @@ DEEPSEEK_API_KEY=your_deepseek_api_key_here
 1. Visit [https://platform.deepseek.com](https://platform.deepseek.com)
 2. Create an account and get your API key
 3. Add it to your `.env.local` file
+
+#### Scraper.tech API (Optional - for social sentiment analysis)
+
+1. Visit [https://scraper.tech](https://scraper.tech)
+2. Sign up for an account and get your API key
+3. Add it to your `.env.local` file
+4. This enables Twitter/X sentiment analysis for stocks
 
 ### 4. Run the Development Server
 

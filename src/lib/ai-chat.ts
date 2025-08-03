@@ -26,7 +26,8 @@ export class StockAnalysisChat {
   }
 
   private formatStockDataForPrompt(stockData: StockData): string {
-    const { quote, timeSeries, technicalIndicators } = stockData;
+    const { quote, timeSeries, technicalIndicators, socialSentiment } =
+      stockData;
 
     let prompt = `STOCK DATA FOR ${quote.symbol}:\n\n`;
 
@@ -91,6 +92,58 @@ export class StockAnalysisChat {
       prompt += "\n";
     }
 
+    // Social sentiment analysis
+    if (socialSentiment && socialSentiment.totalMentions > 0) {
+      console.log(`📊 [AI Chat] Including social sentiment data:`, {
+        overallSentiment: socialSentiment.overallSentiment,
+        totalMentions: socialSentiment.totalMentions,
+        positive: socialSentiment.positive,
+        negative: socialSentiment.negative,
+        neutral: socialSentiment.neutral,
+        trendingTopics: socialSentiment.trendingTopics,
+      });
+
+      prompt += `SOCIAL MEDIA SENTIMENT ANALYSIS:\n`;
+      prompt += `- Overall Sentiment: ${socialSentiment.overallSentiment.toUpperCase()}\n`;
+      prompt += `- Total Mentions: ${socialSentiment.totalMentions}\n`;
+      prompt += `- Positive Mentions: ${socialSentiment.positive} (${(
+        (socialSentiment.positive / socialSentiment.totalMentions) *
+        100
+      ).toFixed(1)}%)\n`;
+      prompt += `- Negative Mentions: ${socialSentiment.negative} (${(
+        (socialSentiment.negative / socialSentiment.totalMentions) *
+        100
+      ).toFixed(1)}%)\n`;
+      prompt += `- Neutral Mentions: ${socialSentiment.neutral} (${(
+        (socialSentiment.neutral / socialSentiment.totalMentions) *
+        100
+      ).toFixed(1)}%)\n`;
+
+      if (socialSentiment.trendingTopics.length > 0) {
+        prompt += `- Trending Topics: ${socialSentiment.trendingTopics.join(
+          ", "
+        )}\n`;
+      }
+
+                   if (socialSentiment.recentTweets.length > 0) {
+               prompt += `- Recent Sentiment Examples:\n`;
+               socialSentiment.recentTweets.slice(0, 3).forEach((tweet, index) => {
+                 prompt += `  ${
+                   index + 1
+                 }. [${tweet.sentiment.toUpperCase()}] ${tweet.text.substring(
+                   0,
+                   100
+                 )}${tweet.text.length > 100 ? "..." : ""}\n`;
+               });
+             }
+             prompt += `- Engagement Metrics: Average likes, retweets, and replies from analyzed tweets\n`;
+      prompt += "\n";
+    } else {
+      console.log(
+        `⚠️ [AI Chat] No social sentiment data available or totalMentions is 0`
+      );
+    }
+
     console.log(prompt);
 
     return prompt;
@@ -109,27 +162,31 @@ IMPORTANT GUIDELINES:
 1. Always base your analysis on the provided stock data and technical indicators
 2. Be objective and balanced in your assessment
 3. Consider both fundamental and technical analysis
-4. Mention risks and uncertainties
-5. Provide specific reasoning for your recommendations
-6. Use clear, professional language
-7. If asked about buying/selling, provide a comprehensive analysis with pros and cons
-8. Always remind users that this is not financial advice and they should consult with a financial advisor
-9. Format your response using clean markdown with proper headings, lists, and emphasis
+4. Include social media sentiment analysis when available
+5. Mention risks and uncertainties
+6. Provide specific reasoning for your recommendations
+7. Use clear, professional language
+8. If asked about buying/selling, provide a comprehensive analysis with pros and cons
+9. Always remind users that this is not financial advice and they should consult with a financial advisor
+10. Format your response using clean markdown with proper headings, lists, and emphasis
 
 ANALYSIS FRAMEWORK:
 - Current market position and recent performance
 - Technical indicators interpretation
 - Volume analysis
 - Price action and trends
+- Social media sentiment analysis (ALWAYS include when available)
 - Risk assessment
 - Investment recommendation with reasoning
 
 FORMATTING GUIDELINES:
 - Use ## for main sections (e.g., "## Current Market Position")
-- Use ### for subsections (e.g., "### Technical Indicators")
+- Use ### for subsections (e.g., "### Technical Indicators", "### Social Sentiment")
 - Use **bold** for important numbers and key points
 - Use bullet points for lists
 - Keep paragraphs concise and well-structured
+- ALWAYS include a "## Social Sentiment Analysis" section when social data is available
+- Include sentiment percentages, trending topics, and key insights from social media
 
 Remember: Past performance doesn't guarantee future results. Always emphasize the importance of diversification and risk management.`;
   }
@@ -143,6 +200,7 @@ Remember: Past performance doesn't guarantee future results. Always emphasize th
 
     const fullPrompt = `${systemPrompt}\n\n${stockDataPrompt}\n\nUSER QUESTION: ${userQuestion}\n\nPlease provide a comprehensive analysis and answer to the user's question.`;
 
+    console.log(fullPrompt);
     try {
       const response = await this.model.invoke([new HumanMessage(fullPrompt)]);
 
