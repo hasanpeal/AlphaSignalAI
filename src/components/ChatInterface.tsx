@@ -113,9 +113,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center space-x-2">
           <Bot className="w-6 h-6 text-blue-500" />
-          <h2 className="text-lg font-semibold text-gray-900">
-            Stock Analysis AI
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">AlphasignalAI</h2>
         </div>
         {selectedStock && (
           <div className="text-sm text-gray-600">
@@ -136,13 +134,11 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <Bot className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg font-medium mb-2">
-              Welcome to Stock Analysis AI
-            </p>
+            <p className="text-lg font-medium mb-2">Welcome to AlphasignalAI</p>
             <p className="text-sm">
               {selectedStock
-                ? `Ask me anything about ${selectedStock}! I can analyze technical indicators, provide investment insights, and answer your questions.`
-                : "Please select a stock first to start analyzing."}
+                ? `I'll analyze Twitter sentiment and market data for ${selectedStock}! I focus on top liked posts from the last 24 hours to identify potential catalysts.`
+                : "Please select a stock first to start analyzing Twitter sentiment and market data."}
             </p>
             {selectedStock && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg max-w-md mx-auto">
@@ -150,12 +146,19 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                   Try asking:
                 </p>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• &ldquo;Is this a good time to buy?&rdquo;</li>
                   <li>
-                    • &ldquo;What do the technical indicators suggest?&rdquo;
+                    • &ldquo;What&apos;s the Twitter sentiment for this
+                    stock?&rdquo;
                   </li>
-                  <li>• &ldquo;How has the stock performed recently?&rdquo;</li>
-                  <li>• &ldquo;What are the risks and opportunities?&rdquo;</li>
+                  <li>
+                    • &ldquo;Are there any catalysts that could move the
+                    price?&rdquo;
+                  </li>
+                  <li>• &ldquo;What do the top liked tweets suggest?&rdquo;</li>
+                  <li>
+                    • &ldquo;Is this a good entry point based on
+                    sentiment?&rdquo;
+                  </li>
                 </ul>
               </div>
             )}
@@ -294,7 +297,9 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
               <div className="bg-gray-100 rounded-lg px-4 py-2">
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                  <span className="text-gray-600">Analyzing...</span>
+                  <span className="text-gray-600">
+                    Analyzing Twitter sentiment...
+                  </span>
                 </div>
               </div>
             </div>
@@ -312,7 +317,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
             onKeyPress={handleKeyPress}
             placeholder={
               selectedStock
-                ? `Ask me about ${selectedStock}...`
+                ? `Ask me about ${selectedStock} Twitter sentiment...`
                 : "Please select a stock first..."
             }
             disabled={!selectedStock || isLoading}

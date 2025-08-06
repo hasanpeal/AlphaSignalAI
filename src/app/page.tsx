@@ -17,10 +17,12 @@ export default function Home() {
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-8 h-8 text-blue-600" />
-                <h1 className="text-xl font-bold text-gray-900">Stock Pilot</h1>
+                <h1 className="text-xl font-bold text-gray-900">
+                  AlphasignalAI
+                </h1>
               </div>
               <div className="hidden sm:block text-sm text-gray-500">
-                AI-Powered Stock Analysis
+                Twitter-First Stock Analysis
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -58,10 +60,10 @@ export default function Home() {
                       Ready to Analyze
                     </h3>
                     <p className="text-sm text-blue-700">
-                      You can now ask questions about{" "}
-                      <strong>{selectedStock}</strong>. The AI will analyze
-                      real-time data including price, volume, and technical
-                      indicators.
+                      I&apos;ll analyze Twitter sentiment for{" "}
+                      <strong>{selectedStock}</strong>, focusing on top 20 liked
+                      posts from the last 24 hours to identify potential
+                      catalysts.
                     </p>
                   </div>
                 )}
@@ -82,15 +84,15 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <Bot className="w-5 h-5 text-blue-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900">
-                Real-Time Data
+                Twitter Sentiment
               </h3>
             </div>
             <p className="text-gray-600 text-sm">
-              Get live stock data from Twelve Data API including price, volume,
-              and technical indicators.
+              Analyzes top 20 liked tweets from the last 24 hours to identify
+              sentiment trends and potential catalysts.
             </p>
           </div>
 
@@ -100,27 +102,27 @@ export default function Home() {
                 <Bot className="w-5 h-5 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900">
-                AI Analysis
+                Hedge Fund Analysis
               </h3>
             </div>
             <p className="text-gray-600 text-sm">
-              Groq AI provides fast, comprehensive analysis and investment
-              insights based on technical and fundamental data.
+              AlphasignalAI provides institutional-grade analysis focusing on
+              catalysts that could move stock prices.
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-purple-600" />
+                <TrendingUp className="w-5 h-5 text-purple-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900">
-                Technical Indicators
+                Market Data
               </h3>
             </div>
             <p className="text-gray-600 text-sm">
-              Advanced technical analysis including RSI, MACD, and Bollinger
-              Bands for informed decision making.
+              Real-time stock data and technical indicators when Twitter
+              sentiment is not available.
             </p>
           </div>
         </div>
@@ -130,8 +132,8 @@ export default function Home() {
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-sm text-gray-500">
-            <p>Stock Pilot - AI-Powered Stock Analysis Tool</p>
-            <p className="mt-2">Powered by Twelve Data API and Groq AI</p>
+            <p>AlphasignalAI - Twitter-First Stock Analysis</p>
+            <p className="mt-2">Powered by Twitter API and Groq AI</p>
             <p className="mt-2 text-xs">
               This tool is for educational purposes only. Not financial advice.
             </p>
