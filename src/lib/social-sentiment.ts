@@ -11,9 +11,12 @@ export interface SocialSentiment {
     text: string;
     sentiment: "positive" | "negative" | "neutral";
     timestamp?: string;
+    likes?: number;
+    retweets?: number;
   }>;
   trendingTopics: string[];
   overallSentiment: "positive" | "negative" | "neutral";
+  hasTwitterData: boolean;
 }
 
 export interface Tweet {
@@ -55,136 +58,109 @@ class SocialSentimentAPI {
     companyName?: string
   ): Promise<SocialSentiment> {
     console.log(
-      `🔍 [Social Sentiment] Starting sentiment analysis for: ${symbol}${
+      `🔍 [AlphasignalAI] Starting Twitter sentiment analysis for: ${symbol}${
         companyName ? ` (${companyName})` : ""
       }`
     );
 
     try {
-      // Focus on stock ticker symbol only for more relevant results
-      const searchTerms = [symbol];
+      // Focus on cashtag and stock ticker searches for top 20 liked posts
+      const searchTerms = [`$${symbol.toUpperCase()}`];
 
       console.log(
-        `📝 [Social Sentiment] Search terms: ${searchTerms.join(", ")}`
+        `📝 [AlphasignalAI] Search terms for top 20 liked posts: ${searchTerms.join(
+          ", "
+        )}`
       );
 
       const allTweets: Tweet[] = [];
 
-      // Fetch tweets for each search term
+      // Fetch tweets for each search term, focusing on top liked posts
       for (const term of searchTerms) {
-        // Try different search variations - focus on stock ticker and stock-related terms
-        const searchVariations = [
-          `$${term}`,
-          `${term} stock`,
-          `${term} $${term}`,
-          `$${term} stock`,
-        ];
-
-        for (const searchQuery of searchVariations) {
-          console.log(
-            `🐦 [Social Sentiment] Fetching tweets for: "${searchQuery}"`
+        console.log(
+          `🐦 [AlphasignalAI] Fetching top 20 liked tweets for: "${term}"`
+        );
+        try {
+          const response = await axios.get(
+            `${SCRAPER_API_BASE_URL}/search.php`,
+            {
+              params: {
+                query: term,
+                cursor: "",
+                search_type: "Top", // Focus on top posts
+                count: 50, // Get more to filter for top 20
+              },
+              headers: {
+                "scraper-key": this.apiKey,
+              },
+              timeout: 30000,
+            }
           );
-          try {
-            const response = await axios.get(
-              `${SCRAPER_API_BASE_URL}/search.php`,
-              {
-                params: {
-                  query: searchQuery,
-                  cursor: "",
-                  search_type: "Top",
-                },
-                headers: {
-                  "scraper-key": this.apiKey,
-                },
-                timeout: 30000,
-              }
+
+          console.log(`📊 [AlphasignalAI] API Response for ${term}:`, {
+            status: response.status,
+            dataLength: response.data?.timeline?.length || 0,
+            hasData: !!response.data?.timeline,
+          });
+
+          if (response.data && response.data.timeline) {
+            // Filter tweets to only include those from last 24 hours and with cashtag
+            const now = new Date();
+            const twentyFourHoursAgo = new Date(
+              now.getTime() - 24 * 60 * 60 * 1000
             );
 
-            console.log(
-              `📊 [Social Sentiment] API Response for ${searchQuery}:`,
-              {
-                status: response.status,
-                dataLength: response.data?.timeline?.length || 0,
-                hasData: !!response.data?.timeline,
-              }
-            );
+            const filteredTweets = response.data.timeline
+              .filter((tweet: Tweet) => {
+                const text = tweet.text.toLowerCase();
+                const tweetDate = new Date(tweet.created_at);
 
-            if (response.data && response.data.timeline) {
-              // Filter tweets to only include those with the stock ticker and stock-related keywords
-              const filteredTweets = response.data.timeline.filter(
-                (tweet: Tweet) => {
-                  const text = tweet.text.toLowerCase();
-                  const tickerVariations = [
-                    `$${term.toLowerCase()}`,
-                    `${term.toLowerCase()} stock`,
-                    `${term.toLowerCase()} shares`,
-                    `${term.toLowerCase()} trading`,
-                    `${term.toLowerCase()} price`,
-                  ];
+                // Must contain cashtag and be from last 24 hours
+                const hasCashtag = text.includes(`$${symbol.toLowerCase()}`);
+                const isRecent = tweetDate >= twentyFourHoursAgo;
 
-                  // Must contain stock ticker AND stock-related keywords
-                  const stockKeywords = [
-                    "stock",
-                    "shares",
-                    "trading",
-                    "price",
-                    "market",
-                    "invest",
-                    "buy",
-                    "sell",
-                    "earnings",
-                    "revenue",
-                  ];
-                  const hasTicker = tickerVariations.some((ticker) =>
-                    text.includes(ticker)
-                  );
-                  const hasStockKeyword = stockKeywords.some((keyword) =>
-                    text.includes(keyword)
-                  );
+                return hasCashtag && isRecent;
+              })
+              .sort(
+                (a: Tweet, b: Tweet) => (b.favorites || 0) - (a.favorites || 0)
+              ) // Sort by likes
+              .slice(0, 20); // Take top 20
 
-                  return hasTicker && hasStockKeyword;
-                }
+            if (filteredTweets.length > 0) {
+              allTweets.push(...filteredTweets);
+              console.log(
+                `✅ [AlphasignalAI] Found ${filteredTweets.length} top liked tweets from last 24 hours for ${term}`
               );
-
-              if (filteredTweets.length > 0) {
-                allTweets.push(...filteredTweets);
-                console.log(
-                  `✅ [Social Sentiment] Added ${filteredTweets.length} stock-related tweets for ${searchQuery} (filtered from ${response.data.timeline.length} total)`
-                );
-                // If we got relevant data, break out of the search variations loop
-                break;
-              } else {
-                console.log(
-                  `⚠️ [Social Sentiment] No stock-related tweets found for ${searchQuery} (${response.data.timeline.length} total tweets, none contained ticker + stock keywords)`
-                );
-              }
             } else {
               console.log(
-                `⚠️ [Social Sentiment] No data received for ${searchQuery}`
+                `⚠️ [AlphasignalAI] No recent cashtag tweets found for ${term}`
               );
             }
-          } catch (error) {
-            console.error(
-              `❌ [Social Sentiment] Error fetching tweets for ${searchQuery}:`,
-              error
-            );
+          } else {
+            console.log(`⚠️ [AlphasignalAI] No data received for ${term}`);
           }
+        } catch (error) {
+          console.error(
+            `❌ [AlphasignalAI] Error fetching tweets for ${term}:`,
+            error
+          );
         }
       }
 
       // Analyze sentiment from the tweets
       console.log(
-        `📈 [Social Sentiment] Total tweets collected: ${allTweets.length}`
+        `📈 [AlphasignalAI] Total top liked tweets collected: ${allTweets.length}`
       );
       const sentiment = this.analyzeSentiment(allTweets);
 
-      console.log(`🎯 [Social Sentiment] Final sentiment analysis:`, {
+      console.log(`🎯 [AlphasignalAI] Final sentiment analysis:`, {
         overallSentiment: sentiment.overallSentiment,
         totalMentions: sentiment.totalMentions,
         positive: sentiment.positive,
         negative: sentiment.negative,
         neutral: sentiment.neutral,
         trendingTopics: sentiment.trendingTopics,
+        hasTwitterData: sentiment.hasTwitterData,
       });
 
       return sentiment;
@@ -196,12 +172,12 @@ class SocialSentimentAPI {
 
   private analyzeSentiment(tweets: Tweet[]): SocialSentiment {
     console.log(
-      `🔍 [Sentiment Analysis] Starting analysis of ${tweets.length} tweets`
+      `🔍 [AlphasignalAI] Starting analysis of ${tweets.length} top liked tweets`
     );
 
     if (!tweets || tweets.length === 0) {
       console.log(
-        `⚠️ [Sentiment Analysis] No tweets to analyze, returning default sentiment`
+        `⚠️ [AlphasignalAI] No tweets to analyze, returning default sentiment`
       );
       return this.getDefaultSentiment();
     }
@@ -213,6 +189,8 @@ class SocialSentimentAPI {
       text: string;
       sentiment: "positive" | "negative" | "neutral";
       timestamp?: string;
+      likes?: number;
+      retweets?: number;
     }> = [];
 
     const positiveKeywords = [
@@ -239,6 +217,14 @@ class SocialSentimentAPI {
       "success",
       "win",
       "winner",
+      "breakout",
+      "breakthrough",
+      "catalyst",
+      "earnings beat",
+      "revenue growth",
+      "partnership",
+      "acquisition",
+      "innovation",
     ];
 
     const negativeKeywords = [
@@ -264,11 +250,17 @@ class SocialSentimentAPI {
       "loser",
       "panic",
       "fear",
+      "miss",
+      "disappointment",
+      "downgrade",
+      "lawsuit",
+      "scandal",
+      "bankruptcy",
     ];
 
-    // Analyze all tweets (up to 20 from each search)
+    // Analyze top 20 liked tweets
     console.log(
-      `📝 [Sentiment Analysis] Analyzing all ${tweets.length} tweets`
+      `📝 [AlphasignalAI] Analyzing top ${tweets.length} liked tweets`
     );
 
     tweets.forEach((tweet: Tweet, index) => {
@@ -297,13 +289,13 @@ class SocialSentimentAPI {
         neutral++;
       }
 
-      // Log every 10th tweet for debugging
-      if (index % 10 === 0) {
+      // Log every 5th tweet for debugging
+      if (index % 5 === 0) {
         console.log(
-          `📄 [Sentiment Analysis] Tweet ${index + 1}: "${text.substring(
+          `📄 [AlphasignalAI] Tweet ${index + 1}: "${text.substring(
             0,
             50
-          )}..." → ${sentiment} (score: ${score})`
+          )}..." → ${sentiment} (score: ${score}, likes: ${tweet.favorites})`
         );
       }
 
@@ -311,13 +303,15 @@ class SocialSentimentAPI {
         text: tweet.text || "No text available",
         sentiment,
         timestamp: tweet.created_at,
+        likes: tweet.favorites,
+        retweets: tweet.retweets,
       });
     });
 
     const totalMentions = positive + negative + neutral;
     const trendingTopics = this.extractTrendingTopics(tweets);
 
-    console.log(`📊 [Sentiment Analysis] Results:`, {
+    console.log(`📊 [AlphasignalAI] Results:`, {
       positive,
       negative,
       neutral,
@@ -333,9 +327,7 @@ class SocialSentimentAPI {
       overallSentiment = "negative";
     }
 
-    console.log(
-      `🎯 [Sentiment Analysis] Overall sentiment: ${overallSentiment}`
-    );
+    console.log(`🎯 [AlphasignalAI] Overall sentiment: ${overallSentiment}`);
 
     return {
       positive,
@@ -345,12 +337,13 @@ class SocialSentimentAPI {
       recentTweets: recentTweets.slice(0, 10), // Limit to 10 recent tweets
       trendingTopics,
       overallSentiment,
+      hasTwitterData: totalMentions > 0,
     };
   }
 
   private extractTrendingTopics(tweets: Tweet[]): string[] {
     console.log(
-      `🔍 [Trending Topics] Extracting topics from ${tweets.length} tweets`
+      `🔍 [AlphasignalAI] Extracting topics from ${tweets.length} tweets`
     );
 
     const topics = new Set<string>();
@@ -381,6 +374,19 @@ class SocialSentimentAPI {
       "competition",
       "partnership",
       "acquisition",
+      "catalyst",
+      "breakout",
+      "breakthrough",
+      "bullish",
+      "bearish",
+      "short squeeze",
+      "meme stock",
+      "retail investors",
+      "institutional",
+      "analyst",
+      "upgrade",
+      "downgrade",
+      "price target",
     ];
 
     tweets.forEach((tweet: Tweet) => {
@@ -393,7 +399,7 @@ class SocialSentimentAPI {
     });
 
     const result = Array.from(topics).slice(0, 5);
-    console.log(`📈 [Trending Topics] Found topics: ${result.join(", ")}`);
+    console.log(`📈 [AlphasignalAI] Found topics: ${result.join(", ")}`);
 
     return result;
   }
@@ -407,6 +413,7 @@ class SocialSentimentAPI {
       recentTweets: [],
       trendingTopics: [],
       overallSentiment: "neutral",
+      hasTwitterData: false,
     };
   }
 }
