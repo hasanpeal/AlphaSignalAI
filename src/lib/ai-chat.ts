@@ -227,14 +227,17 @@ Remember: You are analyzing for institutional investors who need actionable insi
       // Add system prompt first
       messages.push(new HumanMessage(systemPrompt));
 
-      // Add Twitter data context if available
+      // Add Twitter data context if available (ALWAYS include this first)
       if (this.twitterDataContext) {
-        messages.push(new HumanMessage(`CONTEXT: ${this.twitterDataContext}`));
+        messages.push(
+          new HumanMessage(`CONTEXT - TWITTER DATA: ${this.twitterDataContext}`)
+        );
       }
 
-      // Add conversation history
+      // Add conversation history (limit to last 10 messages to prevent context overflow)
       if (this.conversationHistory.length > 0) {
-        messages.push(...this.conversationHistory);
+        const recentHistory = this.conversationHistory.slice(-10);
+        messages.push(...recentHistory);
       }
 
       // Add the follow-up question
