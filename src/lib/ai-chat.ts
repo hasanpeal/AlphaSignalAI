@@ -36,11 +36,11 @@ export class StockAnalysisChat {
       socialSentiment.hasTwitterData &&
       socialSentiment.totalMentions > 0
     ) {
-      prompt += `🐦 TOP 20 LIKED TWEETS FROM LAST 24 HOURS:\n\n`;
+      prompt += `🐦 TOP 60 LIKED TWEETS FROM LAST 24 HOURS:\n\n`;
 
       if (socialSentiment.recentTweets.length > 0) {
         prompt += `ANALYZED TWEETS:\n`;
-        socialSentiment.recentTweets.slice(0, 20).forEach((tweet, index) => {
+        socialSentiment.recentTweets.slice(0, 60).forEach((tweet, index) => {
           const engagement = tweet.likes ? `(${tweet.likes} likes)` : "";
           prompt += `  ${
             index + 1

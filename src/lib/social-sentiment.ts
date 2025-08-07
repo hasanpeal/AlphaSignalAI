@@ -68,7 +68,7 @@ class SocialSentimentAPI {
       const searchTerms = [`$${symbol.toUpperCase()}`];
 
       console.log(
-        `📝 [AlphasignalAI] Search terms for top 20 liked posts: ${searchTerms.join(
+        `📝 [AlphasignalAI] Search terms for top 60 liked posts: ${searchTerms.join(
           ", "
         )}`
       );
@@ -78,73 +78,120 @@ class SocialSentimentAPI {
       // Fetch tweets for each search term, focusing on top liked posts
       for (const term of searchTerms) {
         console.log(
-          `🐦 [AlphasignalAI] Fetching top 20 liked tweets for: "${term}"`
+          `🐦 [AlphasignalAI] Fetching top 60 liked tweets for: "${term}"`
         );
-        try {
-          const response = await axios.get(
-            `${SCRAPER_API_BASE_URL}/search.php`,
-            {
-              params: {
-                query: term,
-                cursor: "",
-                search_type: "Top", // Focus on top posts
-                count: 50, // Get more to filter for top 20
-              },
-              headers: {
-                "scraper-key": this.apiKey,
-              },
-              timeout: 30000,
-            }
-          );
 
-          console.log(`📊 [AlphasignalAI] API Response for ${term}:`, {
-            status: response.status,
-            dataLength: response.data?.timeline?.length || 0,
-            hasData: !!response.data?.timeline,
-          });
+        let cursor = "";
+        let totalTweetsCollected = 0;
+        const maxTweets = 60;
+        const maxRequests = 3; // Limit to 3 API calls to avoid rate limiting
+        let requestCount = 0;
 
-          if (response.data && response.data.timeline) {
-            // Filter tweets to only include those from last 24 hours and with cashtag
-            const now = new Date();
-            const twentyFourHoursAgo = new Date(
-              now.getTime() - 24 * 60 * 60 * 1000
+        while (totalTweetsCollected < maxTweets && requestCount < maxRequests) {
+          try {
+            console.log(
+              `📡 [AlphasignalAI] API Request ${
+                requestCount + 1
+              } for ${term} (cursor: ${cursor ? "present" : "empty"})`
             );
 
-            const filteredTweets = response.data.timeline
-              .filter((tweet: Tweet) => {
-                const text = tweet.text.toLowerCase();
-                const tweetDate = new Date(tweet.created_at);
+            const response = await axios.get(
+              `${SCRAPER_API_BASE_URL}/search.php`,
+              {
+                params: {
+                  query: term,
+                  cursor: cursor,
+                  search_type: "Top", // Focus on top posts
+                  count: 20, // Each request returns 20 tweets
+                },
+                headers: {
+                  "scraper-key": this.apiKey,
+                },
+                timeout: 30000,
+              }
+            );
 
-                // Must contain cashtag and be from last 24 hours
-                const hasCashtag = text.includes(`$${symbol.toLowerCase()}`);
-                const isRecent = tweetDate >= twentyFourHoursAgo;
+            console.log(`📊 [AlphasignalAI] API Response for ${term}:`, {
+              status: response.status,
+              dataLength: response.data?.timeline?.length || 0,
+              hasData: !!response.data?.timeline,
+              hasNextCursor: !!response.data?.next_cursor,
+            });
 
-                return hasCashtag && isRecent;
-              })
-              .sort(
-                (a: Tweet, b: Tweet) => (b.favorites || 0) - (a.favorites || 0)
-              ) // Sort by likes
-              .slice(0, 20); // Take top 20
-
-            if (filteredTweets.length > 0) {
-              allTweets.push(...filteredTweets);
-              console.log(
-                `✅ [AlphasignalAI] Found ${filteredTweets.length} top liked tweets from last 24 hours for ${term}`
+            if (response.data && response.data.timeline) {
+              // Filter tweets to only include those from last 24 hours and with cashtag
+              const now = new Date();
+              const twentyFourHoursAgo = new Date(
+                now.getTime() - 24 * 60 * 60 * 1000
               );
+
+              const filteredTweets = response.data.timeline
+                .filter((tweet: Tweet, tweetIndex: number) => {
+                  const text = tweet.text.toLowerCase();
+                  const tweetDate = new Date(tweet.created_at);
+
+                  // Must contain cashtag and be from last 24 hours
+                  const hasCashtag = text.includes(`$${symbol.toLowerCase()}`);
+                  const isRecent = tweetDate >= twentyFourHoursAgo;
+
+                  // Log tweet filtering for debugging
+                  if (tweetIndex % 10 === 0) {
+                    console.log(
+                      `🔍 [AlphasignalAI] Tweet filtering: "${text.substring(
+                        0,
+                        50
+                      )}..." | Has cashtag: ${hasCashtag} | Is recent: ${isRecent} | Date: ${tweetDate.toISOString()}`
+                    );
+                  }
+
+                  return hasCashtag && isRecent;
+                })
+                .sort(
+                  (a: Tweet, b: Tweet) =>
+                    (b.favorites || 0) - (a.favorites || 0)
+                ); // Sort by likes
+
+              if (filteredTweets.length > 0) {
+                allTweets.push(...filteredTweets);
+                totalTweetsCollected += filteredTweets.length;
+                console.log(
+                  `✅ [AlphasignalAI] Collected ${filteredTweets.length} tweets (total: ${totalTweetsCollected}) for ${term}`
+                );
+              }
+
+              // Update cursor for next request
+              if (
+                response.data.next_cursor &&
+                totalTweetsCollected < maxTweets
+              ) {
+                cursor = response.data.next_cursor;
+                console.log(
+                  `🔄 [AlphasignalAI] Next cursor available, continuing pagination for ${term}`
+                );
+              } else {
+                console.log(
+                  `🏁 [AlphasignalAI] No more cursor or reached limit for ${term}`
+                );
+                break;
+              }
             } else {
-              console.log(
-                `⚠️ [AlphasignalAI] No recent cashtag tweets found for ${term}`
-              );
+              console.log(`⚠️ [AlphasignalAI] No data received for ${term}`);
+              break;
             }
-          } else {
-            console.log(`⚠️ [AlphasignalAI] No data received for ${term}`);
+          } catch (error) {
+            console.error(
+              `❌ [AlphasignalAI] Error fetching tweets for ${term}:`,
+              error
+            );
+            break;
           }
-        } catch (error) {
-          console.error(
-            `❌ [AlphasignalAI] Error fetching tweets for ${term}:`,
-            error
-          );
+
+          requestCount++;
         }
+
+        console.log(
+          `📈 [AlphasignalAI] Completed fetching for ${term}: ${totalTweetsCollected} tweets collected in ${requestCount} requests`
+        );
       }
 
       // Analyze sentiment from the tweets
@@ -258,7 +305,7 @@ class SocialSentimentAPI {
       "bankruptcy",
     ];
 
-    // Analyze top 20 liked tweets
+    // Analyze top 100 liked tweets
     console.log(
       `📝 [AlphasignalAI] Analyzing top ${tweets.length} liked tweets`
     );

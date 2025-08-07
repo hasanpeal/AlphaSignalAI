@@ -7,7 +7,7 @@ A modern Next.js application that combines real-time stock market data with Twit
 - **🔍 Smart Stock Search**: Real-time autocomplete search for any stock symbol with company names and exchange information
 - **📊 Live Market Data**: Real-time quotes, price history, volume analysis, and 52-week ranges
 - **📈 Technical Analysis**: RSI, MACD, and Bollinger Bands indicators with AI interpretation
-- **🐦 Twitter Sentiment Analysis**: Analyzes top 20 liked tweets from the last 24 hours for social sentiment
+- **🐦 Twitter Sentiment Analysis**: Analyzes top 60 liked tweets from the last 24 hours for social sentiment
 - **🤖 AI-Powered Insights**: Groq-powered AI analysis with conversation memory and context awareness
 - **💬 Interactive Chat Interface**: Natural language interface for stock queries with suggested prompts
 - **📱 Modern UI**: Responsive design with dark theme and smooth animations
@@ -111,7 +111,7 @@ Once a stock is selected, you can ask questions like:
 The AI will:
 
 - Fetch real-time stock data and technical indicators
-- Analyze Twitter sentiment from top 20 liked tweets (last 24 hours)
+- Analyze Twitter sentiment from top 60 liked tweets (last 24 hours)
 - Provide comprehensive investment insights
 - Remember conversation context for follow-up questions
 
@@ -173,7 +173,7 @@ src/
 
 ### Twitter Sentiment Analysis
 
-- Analyzes top 20 liked tweets from last 24 hours
+- Analyzes top 60 liked tweets from last 24 hours
 - Focuses on cashtag mentions (e.g., $AAPL)
 - Sentiment classification (positive/negative/neutral)
 - Trending topics extraction
