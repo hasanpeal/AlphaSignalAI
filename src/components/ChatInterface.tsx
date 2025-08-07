@@ -146,15 +146,15 @@ export default function ChatInterface({
     >
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4"
+        className="flex-1 overflow-y-auto p-1 sm:p-4 space-y-2 sm:space-y-4"
         suppressHydrationWarning
       >
         {messages.length === 0 ? (
-          <div className="text-center py-2 sm:py-8 px-2 sm:px-4">
-            <p className="text-xl sm:text-4xl font-light tracking-tight mb-1 sm:mb-2">
+          <div className="text-center py-1 px-2 sm:px-4">
+            <p className="text-lg sm:text-4xl font-light tracking-tight mb-1">
               I am AlphaSignalAI
             </p>
-            <p className="text-gray-400 mb-3 sm:mb-8 font-light text-xs sm:text-base">
+            <p className="text-gray-400 mb-2 font-light text-xs sm:text-base">
               {selectedStock
                 ? `How can I help you analyze ${selectedStock} today?`
                 : "Simply enter a ticker first and ask questions"}
@@ -162,7 +162,7 @@ export default function ChatInterface({
 
             {/* Stock Search - Only show when no stock is selected */}
             {!selectedStock && onStockSelect && (
-              <div className="max-w-md mx-auto mb-3 sm:mb-8">
+              <div className="max-w-md mx-auto mb-2">
                 <StockSearch
                   onStockSelect={onStockSelect}
                   selectedStock={selectedStock}
@@ -172,12 +172,12 @@ export default function ChatInterface({
 
             {/* Suggested Prompts */}
             {suggestedPrompts.length > 0 && (
-              <div className="grid grid-cols-1 gap-2 sm:gap-4 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 gap-1 max-w-2xl mx-auto">
                 {suggestedPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => sendMessage(prompt)}
-                    className="p-2 sm:p-4 bg-gray-800 rounded-lg text-left hover:bg-gray-700 transition-colors text-xs sm:text-sm font-light"
+                    className="p-1.5 bg-gray-800 rounded-lg text-left hover:bg-gray-700 transition-colors text-xs font-light"
                   >
                     {prompt}
                   </button>
@@ -342,11 +342,11 @@ export default function ChatInterface({
 
       {/* Input */}
       <div
-        className="border-t border-gray-800 p-1 sm:p-4 bg-black"
+        className="border-t border-gray-800 p-0.5 sm:p-4 bg-black"
         suppressHydrationWarning
       >
         <div
-          className="flex items-center space-x-2 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2"
+          className="flex items-center space-x-2 bg-gray-800 rounded-lg px-2 sm:px-3 py-1 sm:py-2"
           suppressHydrationWarning
         >
           <input
