@@ -112,21 +112,21 @@ export default function StockSearch({
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto">
           {results.map((stock, index) => (
             <div
               key={`${stock.symbol}-${stock.exchange}-${index}`}
               onClick={() => handleSelectStock(stock)}
-              className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 cursor-pointer hover:bg-gray-700 ${
+              className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2 md:py-3 cursor-pointer hover:bg-gray-700 active:bg-gray-600 transition-colors text-left ${
                 index === selectedIndex ? "bg-gray-700" : ""
               }`}
             >
               <div className="flex justify-between items-center">
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-white text-xs sm:text-sm md:text-base truncate">
+                  <div className="font-semibold text-white text-xs sm:text-sm md:text-base truncate text-left">
                     {stock.symbol}
                   </div>
-                  <div className="text-xs text-gray-300 truncate hidden sm:block">
+                  <div className="text-xs text-gray-300 truncate hidden sm:block text-left">
                     {stock.name}
                   </div>
                 </div>

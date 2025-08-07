@@ -237,7 +237,7 @@ class TwelveDataAPI {
 
       const allResults = response.data.data || [];
 
-      // Filter for NASDAQ stocks only and remove duplicates
+      // Remove duplicates and include stocks from multiple exchanges
       const seenSymbols = new Set<string>();
       const filteredResults = allResults
         .filter(
@@ -247,14 +247,12 @@ class TwelveDataAPI {
             name: string;
             type: string;
           }) => {
-            // Only include NASDAQ stocks
-            const isNasdaq = item.exchange === "NASDAQ";
+            // Check if we've already seen this symbol (case-insensitive)
+            const symbolKey = item.symbol.toUpperCase();
+            const isDuplicate = seenSymbols.has(symbolKey);
 
-            // Check if we've already seen this symbol
-            const isDuplicate = seenSymbols.has(item.symbol);
-
-            if (isNasdaq && !isDuplicate) {
-              seenSymbols.add(item.symbol);
+            if (!isDuplicate) {
+              seenSymbols.add(symbolKey);
               return true;
             }
 
@@ -264,7 +262,7 @@ class TwelveDataAPI {
         .slice(0, 10); // Limit to top 10 results
 
       console.log(
-        `🔍 [Twelve Data] Search results for "${query}": ${allResults.length} total, ${filteredResults.length} NASDAQ unique`
+        `🔍 [Twelve Data] Search results for "${query}": ${allResults.length} total, ${filteredResults.length} unique`
       );
 
       return filteredResults;
