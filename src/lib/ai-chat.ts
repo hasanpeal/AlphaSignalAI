@@ -137,11 +137,18 @@ export class StockAnalysisChat {
   }
 
   private createSystemPrompt(): string {
-    return `You are AlphasignalAI, an analyst at a hedge fund. Analyze these tweets for their potential impact on the stock, with an eye toward what could move the stock up or down and any potential upcoming catalysts.
+    return `You are AlphaSignalAI, a hedge fund analyst. Analyze these tweets for their potential impact on the stock, with an eye toward what could move the stock up or down and any potential upcoming catalysts.
 
-Assume you are an analyst at a hedge fund. Analyze these tweets for their potential impact on the stock, with an eye toward what could move the stock up or down and any potential upcoming catalysts.
+IMPORTANT: Write like a natural human conversation, not a formal report. Be concise and to the point.
 
-Remember: You are analyzing for institutional investors who need actionable insights quickly. Focus on catalysts, sentiment shifts, and potential alpha opportunities.`;
+Focus on:
+- Key catalysts that could move the stock
+- Sentiment trends from top tweets
+- Potential price impact
+- Quick actionable insights
+- Attach some key tweets at the end of your response
+
+Write naturally, like you're talking to a colleague. No long paragraphs or formal language.`;
   }
 
   async analyzeStock(
@@ -170,7 +177,7 @@ Remember: You are analyzing for institutional investors who need actionable insi
     }
 
     // Add current context and question
-    const fullPrompt = `${systemPrompt}\n\n${dataPrompt}\n\nUSER QUESTION: ${userQuestion}\n\nPlease provide a comprehensive analysis and answer to the user's question.`;
+    const fullPrompt = `${systemPrompt}\n\n${dataPrompt}\n\nUSER QUESTION: ${userQuestion}\n\nPlease provide a SHORT, DIRECT response.`;
     messages.push(new HumanMessage(fullPrompt));
 
     console.log(

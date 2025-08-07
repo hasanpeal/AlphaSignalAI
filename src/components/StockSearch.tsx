@@ -87,48 +87,52 @@ export default function StockSearch({
 
   const handleSelectStock = (stock: StockSymbol) => {
     onStockSelect(stock.symbol);
-    setQuery(`${stock.symbol} - ${stock.name}`);
+    setQuery(stock.symbol);
     setIsOpen(false);
     setSelectedIndex(-1);
   };
 
   return (
-    <div className="relative w-full max-w-md" ref={searchRef}>
+    <div className="relative w-full" ref={searchRef}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search for a stock symbol (e.g., AAPL, TSLA)"
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+          placeholder="Search..."
+          className="w-full pl-6 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 md:py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400 text-xs sm:text-sm md:text-base"
         />
         {isLoading && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+          <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2">
+            <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-500"></div>
           </div>
         )}
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {results.map((stock, index) => (
             <div
               key={`${stock.symbol}-${stock.exchange}-${index}`}
               onClick={() => handleSelectStock(stock)}
-              className={`px-4 py-3 cursor-pointer hover:bg-gray-50 ${
-                index === selectedIndex ? "bg-blue-50" : ""
+              className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 cursor-pointer hover:bg-gray-700 ${
+                index === selectedIndex ? "bg-gray-700" : ""
               }`}
             >
               <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-white text-xs sm:text-sm md:text-base truncate">
                     {stock.symbol}
                   </div>
-                  <div className="text-sm text-gray-600">{stock.name}</div>
+                  <div className="text-xs text-gray-300 truncate hidden sm:block">
+                    {stock.name}
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400">{stock.exchange}</div>
+                <div className="text-xs text-gray-400 ml-1 sm:ml-2 flex-shrink-0 hidden sm:block">
+                  {stock.exchange}
+                </div>
               </div>
             </div>
           ))}
@@ -136,8 +140,8 @@ export default function StockSearch({
       )}
 
       {selectedStock && (
-        <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="text-sm text-green-800">
+        <div className="mt-2 p-1.5 sm:p-2 md:p-3 bg-green-900 border border-green-700 rounded-lg">
+          <div className="text-xs sm:text-sm text-green-200">
             Selected: <span className="font-semibold">{selectedStock}</span>
           </div>
         </div>
