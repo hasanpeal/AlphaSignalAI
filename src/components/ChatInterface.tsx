@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, RefreshCw, Mic, Twitter } from "lucide-react";
+import { Send, Bot, User} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -32,11 +32,14 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
   }, [messages]);
 
   const analysisSteps = [
-    { text: "Searching Twitter...", icon: "🔍" },
-    { text: "Extracting top tweets...", icon: "📊" },
-    { text: "Analyzing sentiment...", icon: "💭" },
-    { text: "Identifying catalysts...", icon: "⚡" },
-    { text: "Generating insights...", icon: "💡" },
+    { text: "Searching Twitter", icon: "🔍" },
+    { text: "Extracting top tweets", icon: "📊" },
+    { text: "Analyzing tweets", icon: "💡" },
+    { text: "Extracting keywords", icon: "🔍" },
+    { text: "Analyzing keywords", icon: "💭" },
+    { text: "Identifying catalysts", icon: "⚡" },
+    { text: "Generating insights", icon: "💡" },
+    { text: "Generating summary", icon: "📝" },
   ];
 
   useEffect(() => {
@@ -48,7 +51,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
     } else {
       setAnalysisStep(0);
     }
-  }, [isLoading]);
+  }, [isLoading, analysisSteps.length]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -116,11 +119,6 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-    setSessionId(""); // Clear session when clearing chat
   };
 
   const formatTime = (date: Date) => {
@@ -213,7 +211,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                       <ReactMarkdown
                         components={{
                           h1: ({ children }) => (
-                            <h1 className="text-lg font-semibold mb-2 text-white tracking-tight">
+                            <h1 className="text-base font-semibold mb-2 text-white tracking-tight">
                               {children}
                             </h1>
                           ),
@@ -223,62 +221,62 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                             </h2>
                           ),
                           h3: ({ children }) => (
-                            <h3 className="text-sm font-medium mb-1 mt-2 text-white tracking-tight">
+                            <h3 className="text-base font-medium mb-1 mt-2 text-white tracking-tight">
                               {children}
                             </h3>
                           ),
                           h4: ({ children }) => (
-                            <h4 className="text-sm font-normal mb-1 mt-2 text-white tracking-tight">
+                            <h4 className="text-base font-normal mb-1 mt-2 text-white tracking-tight">
                               {children}
                             </h4>
                           ),
                           h5: ({ children }) => (
-                            <h5 className="text-sm font-normal mb-1 text-white tracking-tight">
+                            <h5 className="text-base font-normal mb-1 text-white tracking-tight">
                               {children}
                             </h5>
                           ),
                           h6: ({ children }) => (
-                            <h6 className="text-sm font-normal mb-1 text-white tracking-tight">
+                            <h6 className="text-base font-normal mb-1 text-white tracking-tight">
                               {children}
                             </h6>
                           ),
                           p: ({ children }) => (
-                            <p className="mb-2 text-white font-light leading-relaxed">
+                            <p className="mb-2 text-base text-white font-light leading-relaxed">
                               {children}
                             </p>
                           ),
                           ul: ({ children }) => (
-                            <ul className="list-disc list-inside mb-2 space-y-1 text-white font-light">
+                            <ul className="list-disc list-inside mb-2 space-y-1 text-base text-white font-light">
                               {children}
                             </ul>
                           ),
                           ol: ({ children }) => (
-                            <ol className="list-decimal list-inside mb-2 space-y-1 text-white font-light">
+                            <ol className="list-decimal list-inside mb-2 space-y-1 text-base text-white font-light">
                               {children}
                             </ol>
                           ),
                           li: ({ children }) => (
-                            <li className="text-sm text-white font-light">
+                            <li className="text-base text-white font-light">
                               {children}
                             </li>
                           ),
                           strong: ({ children }) => (
-                            <strong className="font-medium text-white">
+                            <strong className="text-base font-medium text-white">
                               {children}
                             </strong>
                           ),
                           em: ({ children }) => (
-                            <em className="italic text-white font-light">
+                            <em className="text-base italic text-white font-light">
                               {children}
                             </em>
                           ),
                           code: ({ children }) => (
-                            <code className="bg-gray-700 px-1 py-0.5 rounded text-xs font-mono text-white">
+                            <code className="bg-gray-700 px-1 py-0.5 rounded text-base font-mono text-white">
                               {children}
                             </code>
                           ),
                           blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-gray-600 pl-4 italic text-gray-300 font-light">
+                            <blockquote className="border-l-4 border-gray-600 pl-4 italic text-base text-gray-300 font-light">
                               {children}
                             </blockquote>
                           ),
@@ -306,7 +304,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
           <div className="flex justify-start">
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
-                <Twitter className="w-4 h-4" />
+                <Bot className="w-4 h-4" />
               </div>
               <div className="bg-gray-800 rounded-lg px-4 py-2">
                 <div className="flex items-center space-x-2">
@@ -327,7 +325,6 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
       {/* Input */}
       <div className="border-t border-gray-800 p-4 bg-black">
         <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-2">
-          <Mic className="w-4 h-4 text-gray-400" />
           <input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}

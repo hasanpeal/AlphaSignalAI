@@ -235,7 +235,39 @@ class TwelveDataAPI {
         throw new Error(response.data.message || "Failed to search symbols");
       }
 
-      return response.data.data || [];
+      const allResults = response.data.data || [];
+
+      // Filter for NASDAQ stocks only and remove duplicates
+      const seenSymbols = new Set<string>();
+      const filteredResults = allResults
+        .filter(
+          (item: {
+            symbol: string;
+            exchange: string;
+            name: string;
+            type: string;
+          }) => {
+            // Only include NASDAQ stocks
+            const isNasdaq = item.exchange === "NASDAQ";
+
+            // Check if we've already seen this symbol
+            const isDuplicate = seenSymbols.has(item.symbol);
+
+            if (isNasdaq && !isDuplicate) {
+              seenSymbols.add(item.symbol);
+              return true;
+            }
+
+            return false;
+          }
+        )
+        .slice(0, 10); // Limit to top 10 results
+
+      console.log(
+        `🔍 [Twelve Data] Search results for "${query}": ${allResults.length} total, ${filteredResults.length} NASDAQ unique`
+      );
+
+      return filteredResults;
     } catch (error) {
       console.error("Error searching symbols:", error);
       return [];

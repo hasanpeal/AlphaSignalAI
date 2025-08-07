@@ -31,6 +31,27 @@ export const metadata: Metadata = {
   authors: [{ name: "AlphaSignalAI" }],
   creator: "AlphaSignalAI",
   publisher: "AlphaSignalAI",
+  icons: {
+    icon: [
+      {
+        url: "/icons8-stock-market-cloud-16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/icons8-stock-market-cloud-32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/icons8-stock-market-cloud-96.png",
+        sizes: "96x96",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/icons8-stock-market-cloud-32.png",
+    apple: "/icons8-stock-market-cloud-96.png",
+  },
 };
 
 export default function RootLayout({

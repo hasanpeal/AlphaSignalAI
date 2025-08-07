@@ -101,7 +101,7 @@ export default function StockSearch({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search..."
+          placeholder="Enter Ticker"
           className="w-full pl-6 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 md:py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-800 text-white placeholder-gray-400 text-xs sm:text-sm md:text-base"
         />
         {isLoading && (
