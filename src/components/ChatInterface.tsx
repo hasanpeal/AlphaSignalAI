@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import StockSearch from "@/components/StockSearch";
 
 interface Message {
   id: string;
@@ -13,9 +14,13 @@ interface Message {
 
 interface ChatInterfaceProps {
   selectedStock?: string;
+  onStockSelect?: (symbol: string) => void;
 }
 
-export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
+export default function ChatInterface({
+  selectedStock,
+  onStockSelect,
+}: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +44,6 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
     { text: "Analyzing keywords", icon: "💭" },
     { text: "Identifying catalysts", icon: "⚡" },
     { text: "Generating insights", icon: "💡" },
-    { text: "Generating summary", icon: "📝" },
   ];
 
   useEffect(() => {
@@ -147,8 +151,18 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
             <p className="text-gray-400 mb-6 sm:mb-8 font-light text-sm sm:text-base">
               {selectedStock
                 ? `How can I help you analyze ${selectedStock} today?`
-                : "Simply pick a stock first and ask questions"}
+                : "Simply enter a ticker first and ask questions"}
             </p>
+
+            {/* Stock Search - Only show when no stock is selected */}
+            {!selectedStock && onStockSelect && (
+              <div className="max-w-md mx-auto mb-6 sm:mb-8">
+                <StockSearch
+                  onStockSelect={onStockSelect}
+                  selectedStock={selectedStock}
+                />
+              </div>
+            )}
 
             {/* Suggested Prompts */}
             {suggestedPrompts.length > 0 && (
@@ -174,10 +188,10 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
               }`}
             >
               <div
-                className={`flex items-start space-x-2 sm:space-x-3 max-w-[85%] sm:max-w-[80%] ${
+                className={`flex items-start max-w-[85%] sm:max-w-[80%] ${
                   message.role === "user"
-                    ? "flex-row-reverse space-x-reverse"
-                    : ""
+                    ? "flex-row-reverse space-x-reverse space-x-3"
+                    : "space-x-3"
                 }`}
               >
                 <div

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AlphaSignalAI",
   description:
-    "AlphaSignalAI is an AI-powered stock analysis tool that uses Twitter data to analyze stocks.",
+    "AlphaSignalAI is an AI-powered stock analysis tool that uses Twitter data to analyze stocks",
   keywords: [
     "stock analysis",
     "AI trading",
