@@ -12,19 +12,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#3b82f6",
     icons: [
       {
-        src: "/icons8-stock-market-cloud-16.png",
-        sizes: "16x16",
-        type: "image/png",
-      },
-      {
-        src: "/icons8-stock-market-cloud-32.png",
-        sizes: "32x32",
-        type: "image/png",
-      },
-      {
-        src: "/icons8-stock-market-cloud-96.png",
-        sizes: "96x96",
-        type: "image/png",
+        src: "/alpha_signal_favicon.ico",
+        sizes: "any",
+        type: "image/x-icon",
       },
     ],
   };

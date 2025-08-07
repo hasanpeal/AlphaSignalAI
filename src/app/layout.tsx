@@ -34,29 +34,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icons8-stock-market-cloud-16.png",
-        sizes: "16x16",
-        type: "image/png",
-      },
-      {
-        url: "/icons8-stock-market-cloud-32.png",
-        sizes: "32x32",
-        type: "image/png",
-      },
-      {
-        url: "/icons8-stock-market-cloud-96.png",
-        sizes: "96x96",
-        type: "image/png",
+        url: "/alpha_signal_favicon.ico",
+        sizes: "any",
+        type: "image/x-icon",
       },
     ],
-    shortcut: "/icons8-stock-market-cloud-32.png",
-    apple: "/icons8-stock-market-cloud-96.png",
+    shortcut: "/alpha_signal_favicon.ico",
+    apple: "/alpha_signal_favicon.ico",
   },
   viewport: {
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    maximumScale: 5,
+    userScalable: true,
   },
 };
 
@@ -70,7 +60,7 @@ export default function RootLayout({
       <head>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+          content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
         />
       </head>
       <body

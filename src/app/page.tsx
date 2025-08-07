@@ -15,15 +15,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div
+      className="h-screen bg-black flex flex-col overflow-hidden"
+      suppressHydrationWarning
+    >
       {/* Main Content - Full Screen Chat */}
-      <main className="flex flex-col h-screen">
+      <main className="flex flex-col h-full" suppressHydrationWarning>
         {/* Header with branding */}
-        <div className="flex items-center justify-between p-4 flex-shrink-0">
+        <div className="flex items-center justify-between p-2 sm:p-4 flex-shrink-0">
           {/* Left side - Branding */}
           <div className="flex items-center space-x-2">
             <h1
-              className="text-2xl font-light tracking-tight text-white cursor-pointer"
+              className="text-xl sm:text-2xl font-light tracking-tight text-white cursor-pointer"
               onClick={() => window.location.reload()}
             >
               AlphaSignalAI
@@ -34,9 +37,9 @@ export default function Home() {
           {selectedStock && (
             <button
               onClick={handleNewChat}
-              className="flex items-center space-x-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
+              className="flex items-center space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-xs sm:text-sm"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="cursor-pointer">New Chat</span>
             </button>
           )}
