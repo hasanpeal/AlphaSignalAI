@@ -1,32 +1,37 @@
-# Stock Pilot - AI-Powered Stock Analysis Tool
+# AlphaSignalAI - AI-Powered Stock Analysis with Twitter Sentiment
 
-A Next.js application that combines real-time stock data from Twelve Data API with DeepSeek AI to provide intelligent stock analysis and investment insights.
+A modern Next.js application that combines real-time stock market data with Twitter/X sentiment analysis to provide comprehensive AI-powered stock insights and investment recommendations.
 
-## Features
+## 🚀 Features
 
-- 🔍 **Stock Search**: Search and select any stock symbol with autocomplete
-- 📊 **Real-Time Data**: Live stock data including price, volume, and technical indicators
-- 🤖 **AI Analysis**: DeepSeek AI-powered analysis with context memory
-- 📈 **Technical Indicators**: RSI, MACD, and Bollinger Bands analysis
-- 💬 **Interactive Chat**: Natural language interface for stock queries
-- 🎯 **Investment Insights**: Comprehensive buy/sell analysis and recommendations
+- **🔍 Smart Stock Search**: Real-time autocomplete search for any stock symbol with company names and exchange information
+- **📊 Live Market Data**: Real-time quotes, price history, volume analysis, and 52-week ranges
+- **📈 Technical Analysis**: RSI, MACD, and Bollinger Bands indicators with AI interpretation
+- **🐦 Twitter Sentiment Analysis**: Analyzes top 20 liked tweets from the last 24 hours for social sentiment
+- **🤖 AI-Powered Insights**: Groq-powered AI analysis with conversation memory and context awareness
+- **💬 Interactive Chat Interface**: Natural language interface for stock queries with suggested prompts
+- **📱 Modern UI**: Responsive design with dark theme and smooth animations
+- **🔄 Session Management**: Persistent conversation sessions with automatic cleanup
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS 4
 - **Backend**: Next.js API Routes
-- **AI**: LangChain with DeepSeek AI
-- **Data**: Twelve Data API
-- **UI**: Lucide React Icons
+- **AI**: LangChain with Groq (Llama 4 Scout 17B)
+- **Data**: Twelve Data API for stock data
+- **Social**: Scraper.tech API for Twitter sentiment
+- **UI Components**: Radix UI, Lucide React Icons
+- **Styling**: Tailwind CSS with custom animations
 
-## Prerequisites
+## 📋 Prerequisites
 
 - Node.js 18+
 - npm or yarn
 - Twelve Data API key
-- DeepSeek API key
+- Groq API key
+- Scraper.tech API key (for Twitter sentiment)
 
-## Setup Instructions
+## ⚙️ Setup Instructions
 
 ### 1. Clone and Install Dependencies
 
@@ -41,13 +46,13 @@ npm install
 Create a `.env.local` file in the root directory:
 
 ```env
-# Twelve Data API Key
+# Twelve Data API Key (Required)
 TWELVE_DATA_API_KEY=your_twelve_data_api_key_here
 
-# Groq API Key (for fast AI responses)
+# Groq API Key (Required for AI analysis)
 GROQ_API_KEY=your_groq_api_key_here
 
-# Scraper.tech API Key (for social sentiment analysis)
+# Scraper.tech API Key (Required for Twitter sentiment)
 SCRAPER_API_KEY=your_scraper_api_key_here
 ```
 
@@ -60,19 +65,19 @@ SCRAPER_API_KEY=your_scraper_api_key_here
 3. Get your API key from the dashboard
 4. Add it to your `.env.local` file
 
-#### Groq API (for fast AI responses)
+#### Groq API
 
 1. Visit [https://console.groq.com](https://console.groq.com)
 2. Create an account and get your API key
 3. Add it to your `.env.local` file
-4. This provides fast responses using Llama3-8B model (fastest and cheapest option)
+4. Used for fast AI responses using Llama 4 Scout 17B model
 
-#### Scraper.tech API (Optional - for social sentiment analysis)
+#### Scraper.tech API
 
 1. Visit [https://scraper.tech](https://scraper.tech)
 2. Sign up for an account and get your API key
 3. Add it to your `.env.local` file
-4. This enables Twitter/X sentiment analysis for stocks
+4. Enables Twitter/X sentiment analysis for stocks
 
 ### 4. Run the Development Server
 
@@ -82,7 +87,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Usage
+## 🎯 Usage
 
 ### 1. Select a Stock
 
@@ -94,94 +99,149 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 Once a stock is selected, you can ask questions like:
 
-- "Is this a good time to buy?"
-- "What do the technical indicators suggest?"
+- "What's the Twitter sentiment for this stock?"
+- "Are there any catalysts that could move this stock?"
+- "What do the top liked tweets suggest?"
+- "Is this a good entry point?"
+- "What do the technical indicators show?"
 - "How has the stock performed recently?"
-- "What are the risks and opportunities?"
-- "Should I sell my position?"
 
 ### 3. Get AI Analysis
 
 The AI will:
 
-- Fetch real-time stock data
-- Analyze technical indicators (RSI, MACD, Bollinger Bands)
+- Fetch real-time stock data and technical indicators
+- Analyze Twitter sentiment from top 20 liked tweets (last 24 hours)
 - Provide comprehensive investment insights
 - Remember conversation context for follow-up questions
 
-## Example Use Case
+## 🔧 API Endpoints
 
-1. **Select Tesla (TSLA)** from the stock search
-2. **Ask**: "Is this a good time to buy Tesla?"
-3. **AI Response**: The AI will analyze:
-   - Current price and recent performance
-   - Technical indicators (RSI, MACD, Bollinger Bands)
-   - Volume analysis
-   - Risk assessment
-   - Investment recommendation with reasoning
+### `/api/chat`
 
-## API Endpoints
-
-### `/api/stock-data`
-
-- **GET** `/api/stock-data?symbol=AAPL`
-- Returns comprehensive stock data including quote, time series, and technical indicators
+- **POST** `/api/chat`
+- Body: `{ message: string, symbol: string, isNewConversation: boolean, sessionId: string }`
+- Returns AI analysis response with session management
 
 ### `/api/search-symbols`
 
 - **GET** `/api/search-symbols?q=tesla`
 - Returns matching stock symbols for search functionality
 
-### `/api/chat`
+### `/api/stock-data`
 
-- **POST** `/api/chat`
-- Body: `{ message: "string", symbol: "string", isNewConversation: boolean }`
-- Returns AI analysis response
+- **GET** `/api/stock-data?symbol=AAPL`
+- Returns comprehensive stock data including quote, time series, and technical indicators
 
-## Project Structure
+### `/api/social-sentiment`
+
+- **GET** `/api/social-sentiment?symbol=AAPL&company=Apple Inc`
+- Returns Twitter sentiment analysis for the specified stock
+
+## 📁 Project Structure
 
 ```
 src/
 ├── app/
 │   ├── api/
-│   │   ├── chat/route.ts          # AI chat endpoint
-│   │   ├── search-symbols/route.ts # Stock search endpoint
-│   │   └── stock-data/route.ts    # Stock data endpoint
-│   ├── globals.css                # Global styles
-│   ├── layout.tsx                 # Root layout
-│   └── page.tsx                   # Main page component
+│   │   ├── chat/route.ts              # AI chat endpoint
+│   │   ├── search-symbols/route.ts    # Stock search endpoint
+│   │   ├── stock-data/route.ts        # Stock data endpoint
+│   │   └── social-sentiment/route.ts  # Twitter sentiment endpoint
+│   ├── globals.css                    # Global styles
+│   ├── layout.tsx                     # Root layout with favicon
+│   ├── manifest.ts                    # PWA manifest
+│   └── page.tsx                       # Main page component
 ├── components/
-│   ├── ChatInterface.tsx          # Chat UI component
-│   └── StockSearch.tsx            # Stock search component
+│   ├── ChatInterface.tsx              # Chat UI with Twitter integration
+│   └── StockSearch.tsx                # Stock search component
 └── lib/
-    ├── ai-chat.ts                 # LangChain + DeepSeek integration
-    └── twelve-data.ts             # Twelve Data API utilities
+    ├── ai-chat.ts                     # LangChain + Groq integration
+    ├── conversation-store.ts           # Session management
+    ├── social-sentiment.ts            # Twitter sentiment analysis
+    └── twelve-data.ts                 # Twelve Data API utilities
 ```
 
-## Key Features Explained
+## 🎨 Key Features Explained
 
 ### Stock Data Integration
 
-- Real-time quotes and price data
-- Historical time series data
+- Real-time quotes and price data from Twelve Data API
+- Historical time series data (30 days)
 - Technical indicators (RSI, MACD, Bollinger Bands)
-- Volume and market analysis
+- Volume analysis and 52-week ranges
+
+### Twitter Sentiment Analysis
+
+- Analyzes top 20 liked tweets from last 24 hours
+- Focuses on cashtag mentions (e.g., $AAPL)
+- Sentiment classification (positive/negative/neutral)
+- Trending topics extraction
+- Engagement metrics (likes, retweets)
 
 ### AI Analysis
 
 - Context-aware conversations using LangChain
+- Groq-powered responses with Llama 4 Scout 17B
 - Comprehensive financial analysis
 - Risk assessment and recommendations
 - Professional investment insights
 
 ### User Experience
 
-- Modern, responsive design
+- Modern, responsive dark theme design
 - Real-time search with autocomplete
-- Interactive chat interface
+- Interactive chat interface with suggested prompts
 - Loading states and error handling
+- Session persistence with automatic cleanup
 
-## Customization
+## 🔄 Session Management
+
+The application maintains conversation sessions with:
+
+- 30-minute session timeout
+- Automatic cleanup of expired sessions
+- Context preservation for follow-up questions
+- Session reset when switching stocks
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy automatically
+
+### Environment Variables for Production
+
+Ensure all required environment variables are set:
+
+- `TWELVE_DATA_API_KEY`
+- `GROQ_API_KEY`
+- `SCRAPER_API_KEY`
+
+## 🐛 Troubleshooting
+
+### API Key Issues
+
+- Ensure all API keys are correctly set in `.env.local`
+- Check API key permissions and quotas
+- Verify API endpoints are accessible
+
+### Build Errors
+
+- Ensure all dependencies are installed: `npm install`
+- Check TypeScript compilation: `npm run build`
+- Verify environment variables are set
+
+### Runtime Errors
+
+- Check browser console for frontend errors
+- Check server logs for API errors
+- Verify API endpoints are working
+
+## 📝 Customization
 
 ### Adding New Technical Indicators
 
@@ -206,44 +266,11 @@ private createSystemPrompt(): string {
 }
 ```
 
-## Deployment
+### Twitter Sentiment Keywords
 
-### Vercel (Recommended)
+Edit `src/lib/social-sentiment.ts` to customize sentiment analysis keywords.
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically
-
-### Other Platforms
-
-The app can be deployed to any platform that supports Next.js:
-
-- Netlify
-- Railway
-- DigitalOcean App Platform
-
-## Troubleshooting
-
-### API Key Issues
-
-- Ensure both API keys are correctly set in `.env.local`
-- Check API key permissions and quotas
-- Verify API endpoints are accessible
-
-### Build Errors
-
-- Ensure all dependencies are installed: `npm install`
-- Check TypeScript compilation: `npm run build`
-- Verify environment variables are set
-
-### Runtime Errors
-
-- Check browser console for frontend errors
-- Check server logs for API errors
-- Verify API endpoints are working
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -251,10 +278,18 @@ The app can be deployed to any platform that supports Next.js:
 4. Add tests if applicable
 5. Submit a pull request
 
-## License
+## 📄 License
 
 This project is for educational purposes only. Not financial advice.
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 This tool is for educational and informational purposes only. It does not constitute financial advice. Always consult with a qualified financial advisor before making investment decisions. Past performance does not guarantee future results.
+
+## 🔗 Links
+
+- [Twelve Data API](https://twelvedata.com)
+- [Groq API](https://console.groq.com)
+- [Scraper.tech API](https://scraper.tech)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com)
