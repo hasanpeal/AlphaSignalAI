@@ -15,11 +15,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black flex flex-col">
       {/* Main Content - Full Screen Chat */}
-      <main className="h-screen flex flex-col">
+      <main className="flex flex-col h-screen">
         {/* Header with branding */}
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 flex-shrink-0">
           {/* Left side - Branding */}
           <div className="flex items-center space-x-2">
             <h1
@@ -43,7 +43,7 @@ export default function Home() {
         </div>
 
         {/* Chat Interface - Full Screen */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-h-0">
           <ChatInterface
             key={resetKey}
             selectedStock={selectedStock}
