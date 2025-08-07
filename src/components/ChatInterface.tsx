@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import StockSearch from "@/components/StockSearch";
@@ -27,14 +27,8 @@ export default function ChatInterface({
   const [sessionId, setSessionId] = useState<string>("");
   const [analysisStep, setAnalysisStep] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [userHasScrolled, setUserHasScrolled] = useState(false);
 
   const analysisSteps = [
     { text: "Searching Twitter", icon: "🔍" },
@@ -45,6 +39,45 @@ export default function ChatInterface({
     { text: "Identifying catalysts", icon: "⚡" },
     { text: "Generating insights", icon: "💡" },
   ];
+
+  // Smart scroll behavior - only auto-scroll if user hasn't manually scrolled
+  const scrollToBottom = useCallback(
+    (force = false) => {
+      if (!messagesEndRef.current) return;
+
+      if (force || !userHasScrolled) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    },
+    [userHasScrolled]
+  );
+
+  // Handle scroll events to detect user scrolling
+  const handleScroll = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } =
+      messagesContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+    if (!isAtBottom) {
+      setUserHasScrolled(true);
+    } else {
+      setUserHasScrolled(false);
+    }
+  }, []);
+
+  // Auto-scroll on new messages, but respect user scroll
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages, scrollToBottom]);
+
+  // Reset user scroll state when starting new conversation
+  useEffect(() => {
+    setUserHasScrolled(false);
+  }, [selectedStock]);
 
   useEffect(() => {
     if (isLoading) {
@@ -71,6 +104,7 @@ export default function ChatInterface({
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
+    setUserHasScrolled(false); // Reset scroll state for new message
 
     try {
       const response = await fetch("/api/chat", {
@@ -140,21 +174,19 @@ export default function ChatInterface({
     : [];
 
   return (
-    <div
-      className="flex flex-col h-full bg-black text-white overflow-hidden"
-      suppressHydrationWarning
-    >
-      {/* Messages */}
+    <div className="flex flex-col h-full bg-black text-white">
+      {/* Messages Container */}
       <div
-        className="flex-1 overflow-y-auto p-1 sm:p-4 space-y-2 sm:space-y-4"
-        suppressHydrationWarning
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
       >
         {messages.length === 0 ? (
-          <div className="text-center py-1 px-2 sm:px-4">
-            <p className="text-lg sm:text-4xl font-light tracking-tight mb-1">
+          <div className="text-center py-8">
+            <p className="text-2xl sm:text-4xl font-light tracking-tight mb-4">
               I am AlphaSignalAI
             </p>
-            <p className="text-gray-400 mb-2 font-light text-xs sm:text-base">
+            <p className="text-gray-400 mb-6 font-light text-sm sm:text-base">
               {selectedStock
                 ? `How can I help you analyze ${selectedStock} today?`
                 : "Simply enter a ticker first and ask questions"}
@@ -162,7 +194,7 @@ export default function ChatInterface({
 
             {/* Stock Search - Only show when no stock is selected */}
             {!selectedStock && onStockSelect && (
-              <div className="max-w-md mx-auto mb-2">
+              <div className="max-w-md mx-auto mb-6">
                 <StockSearch
                   onStockSelect={onStockSelect}
                   selectedStock={selectedStock}
@@ -172,12 +204,12 @@ export default function ChatInterface({
 
             {/* Suggested Prompts */}
             {suggestedPrompts.length > 0 && (
-              <div className="grid grid-cols-1 gap-1 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 gap-2 max-w-2xl mx-auto">
                 {suggestedPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => sendMessage(prompt)}
-                    className="p-1.5 bg-gray-800 rounded-lg text-left hover:bg-gray-700 transition-colors text-xs font-light"
+                    className="p-3 bg-gray-800 rounded-lg text-left hover:bg-gray-700 transition-colors text-sm font-light"
                   >
                     {prompt}
                   </button>
@@ -201,20 +233,20 @@ export default function ChatInterface({
                 }`}
               >
                 <div
-                  className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                     message.role === "user"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-700 text-white"
                   }`}
                 >
                   {message.role === "user" ? (
-                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <User className="w-4 h-4" />
                   ) : (
-                    <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Bot className="w-4 h-4" />
                   )}
                 </div>
                 <div
-                  className={`rounded-lg px-3 py-2 sm:px-4 sm:py-2 ${
+                  className={`rounded-lg px-4 py-3 ${
                     message.role === "user"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-800 text-white"
@@ -229,34 +261,19 @@ export default function ChatInterface({
                       <ReactMarkdown
                         components={{
                           h1: ({ children }) => (
-                            <h1 className="text-sm sm:text-base font-semibold mb-2 text-white tracking-tight">
+                            <h1 className="text-base font-semibold mb-2 text-white tracking-tight">
                               {children}
                             </h1>
                           ),
                           h2: ({ children }) => (
-                            <h2 className="text-sm sm:text-base font-medium mb-2 mt-3 text-white tracking-tight">
+                            <h2 className="text-base font-medium mb-2 mt-3 text-white tracking-tight">
                               {children}
                             </h2>
                           ),
                           h3: ({ children }) => (
-                            <h3 className="text-sm sm:text-base font-medium mb-1 mt-2 text-white tracking-tight">
+                            <h3 className="text-base font-medium mb-1 mt-2 text-white tracking-tight">
                               {children}
                             </h3>
-                          ),
-                          h4: ({ children }) => (
-                            <h4 className="text-sm sm:text-base font-normal mb-1 mt-2 text-white tracking-tight">
-                              {children}
-                            </h4>
-                          ),
-                          h5: ({ children }) => (
-                            <h5 className="text-sm sm:text-base font-normal mb-1 text-white tracking-tight">
-                              {children}
-                            </h5>
-                          ),
-                          h6: ({ children }) => (
-                            <h6 className="text-sm sm:text-base font-normal mb-1 text-white tracking-tight">
-                              {children}
-                            </h6>
                           ),
                           p: ({ children }) => (
                             <p className="mb-2 text-sm sm:text-base text-white font-light leading-relaxed">
@@ -289,12 +306,12 @@ export default function ChatInterface({
                             </em>
                           ),
                           code: ({ children }) => (
-                            <code className="bg-gray-700 px-1 py-0.5 rounded text-sm sm:text-base font-mono text-white">
+                            <code className="bg-gray-700 px-1 py-0.5 rounded text-sm font-mono text-white">
                               {children}
                             </code>
                           ),
                           blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-gray-600 pl-4 italic text-sm sm:text-base text-gray-300 font-light">
+                            <blockquote className="border-l-4 border-gray-600 pl-4 italic text-sm text-gray-300 font-light">
                               {children}
                             </blockquote>
                           ),
@@ -305,7 +322,7 @@ export default function ChatInterface({
                     </div>
                   )}
                   <div
-                    className={`text-xs mt-1 ${
+                    className={`text-xs mt-2 ${
                       message.role === "user"
                         ? "text-blue-200"
                         : "text-gray-400"
@@ -318,18 +335,19 @@ export default function ChatInterface({
             </div>
           ))
         )}
+
         {isLoading && (
           <div className="flex justify-start">
-            <div className="flex items-start space-x-2 sm:space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
-                <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
+                <Bot className="w-4 h-4" />
               </div>
-              <div className="bg-gray-800 rounded-lg px-3 py-2 sm:px-4 sm:py-2">
+              <div className="bg-gray-800 rounded-lg px-4 py-3">
                 <div className="flex items-center space-x-2">
-                  <div className="animate-pulse text-blue-400 text-base sm:text-lg">
+                  <div className="animate-pulse text-blue-400 text-lg">
                     {analysisSteps[analysisStep].icon}
                   </div>
-                  <span className="text-gray-300 font-light text-sm sm:text-base">
+                  <span className="text-gray-300 font-light text-sm">
                     {analysisSteps[analysisStep].text}
                   </span>
                 </div>
@@ -337,17 +355,21 @@ export default function ChatInterface({
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} suppressHydrationWarning />
+
+        <div
+          ref={messagesEndRef}
+          className="shrink-0 min-w-[24px] min-h-[24px]"
+        />
       </div>
 
-      {/* Input */}
-      <div
-        className="border-t border-gray-800 p-0.5 sm:p-4 bg-black"
-        suppressHydrationWarning
-      >
-        <div
-          className="flex items-center space-x-2 bg-gray-800 rounded-lg px-2 sm:px-3 py-1 sm:py-2"
-          suppressHydrationWarning
+      {/* Input Form */}
+      <div className="border-t border-gray-800 p-4 bg-black">
+        <form
+          className="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
+          }}
         >
           <input
             value={inputMessage}
@@ -355,16 +377,16 @@ export default function ChatInterface({
             onKeyPress={handleKeyPress}
             placeholder="Send a message..."
             disabled={!selectedStock || isLoading}
-            className="flex-1 bg-transparent text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed font-light text-sm sm:text-base"
+            className="flex-1 bg-transparent text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed font-light text-sm"
           />
           <button
-            onClick={() => sendMessage()}
+            type="submit"
             disabled={!inputMessage.trim() || !selectedStock || isLoading}
-            className="p-1.5 sm:p-2 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
-            <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+            <Send className="w-4 h-4" />
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

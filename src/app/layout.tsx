@@ -42,12 +42,14 @@ export const metadata: Metadata = {
     shortcut: "/alpha_signal_favicon.ico",
     apple: "/alpha_signal_favicon.ico",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+// Mobile-friendly viewport configuration
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1, // Disable auto-zoom on mobile Safari
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -56,13 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
-        />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
