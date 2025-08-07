@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  stock-pilot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env.local
+    volumes:
+      # Mount source code for live reloading
+      - .:/app
+      # Exclude node_modules to use container's version
+      - /app/node_modules
+      # Exclude .next to use container's version
+      - /app/.next
+    restart: unless-stopped
+    container_name: stock-pilot-app
+    networks:
+      - stock-pilot-network
+
+networks:
+  stock-pilot-network:
+    driver: bridge
