@@ -43,9 +43,9 @@ export default function Home() {
           {selectedStock && (
             <button
               onClick={handleExit}
-              className="absolute top-4 left-4 z-10 p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors"
+              className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10 p-1.5 sm:p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors flex items-center justify-center"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           )}
           <ChatInterface key={resetKey} selectedStock={selectedStock} />
