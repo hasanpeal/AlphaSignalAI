@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import StockSearch from "@/components/StockSearch";
 import ChatInterface from "@/components/ChatInterface";
 import { RefreshCw, Mail } from "lucide-react";
 
@@ -15,7 +14,7 @@ export default function Home() {
   };
 
   const handleContactUs = () => {
-    window.open("mailto:Jeremy@shoykhet.co", "_blank");
+    window.open("mailto:alphasignalxyz@gmail.com", "_blank");
   };
 
   return (
