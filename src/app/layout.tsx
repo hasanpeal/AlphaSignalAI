@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stock Pilot - AI-Powered Stock Analysis Tool",
+  title: "AlphaSignalAI",
   description:
-    "Get real-time stock analysis with AI-powered insights. Analyze stocks using technical indicators, social sentiment, and comprehensive market data. Powered by Twelve Data API and DeepSeek AI.",
+    "AlphaSignalAI is an AI-powered stock analysis tool that uses Twitter data to analyze stocks.",
   keywords: [
     "stock analysis",
     "AI trading",
@@ -28,9 +28,9 @@ export const metadata: Metadata = {
     "market data",
     "investment advice",
   ],
-  authors: [{ name: "Stock Pilot" }],
-  creator: "Stock Pilot",
-  publisher: "Stock Pilot",
+  authors: [{ name: "AlphaSignalAI" }],
+  creator: "AlphaSignalAI",
+  publisher: "AlphaSignalAI",
 };
 
 export default function RootLayout({

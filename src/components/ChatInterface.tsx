@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, RefreshCw } from "lucide-react";
+import { Send, Bot, User, RefreshCw, Mic, Twitter } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -20,6 +20,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>("");
+  const [analysisStep, setAnalysisStep] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -29,6 +30,25 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const analysisSteps = [
+    { text: "Searching Twitter...", icon: "🔍" },
+    { text: "Extracting top tweets...", icon: "📊" },
+    { text: "Analyzing sentiment...", icon: "💭" },
+    { text: "Identifying catalysts...", icon: "⚡" },
+    { text: "Generating insights...", icon: "💡" },
+  ];
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setAnalysisStep((prev) => (prev + 1) % analysisSteps.length);
+      }, 800);
+      return () => clearInterval(interval);
+    } else {
+      setAnalysisStep(0);
+    }
+  }, [isLoading]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -107,59 +127,45 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-        <div className="flex items-center space-x-2">
-          <Bot className="w-6 h-6 text-blue-500" />
-          <h2 className="text-lg font-semibold text-gray-900">AlphasignalAI</h2>
-        </div>
-        {selectedStock && (
-          <div className="text-sm text-gray-600">
-            Analyzing: <span className="font-semibold">{selectedStock}</span>
-          </div>
-        )}
-        <button
-          onClick={clearChat}
-          className="flex items-center space-x-1 text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          <span className="text-sm">Clear</span>
-        </button>
-      </div>
+  const suggestedPrompts = selectedStock
+    ? [
+        `What's the Twitter sentiment for ${selectedStock}?`,
+        `Are there any catalysts that could move ${selectedStock}?`,
+        `What do the top liked tweets suggest for ${selectedStock}?`,
+        `Is this a good entry point for ${selectedStock}?`,
+      ]
+    : [];
 
+  return (
+    <div className="flex flex-col h-full bg-black text-white">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <Bot className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg font-medium mb-2">Welcome to AlphasignalAI</p>
-            <p className="text-sm">
-              {selectedStock
-                ? `I'll analyze Twitter sentiment and market data for ${selectedStock}! I focus on top liked posts from the last 24 hours to identify potential catalysts.`
-                : "Please select a stock first to start analyzing Twitter sentiment and market data."}
+          <div className="text-center py-8">
+            <p className="text-4xl font-light tracking-tight mb-2">
+              I am AlphaSignalAI
             </p>
-            {selectedStock && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg max-w-md mx-auto">
-                <p className="text-sm text-blue-800 font-medium mb-2">
-                  Try asking:
-                </p>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  <li>
-                    • &ldquo;What&apos;s the Twitter sentiment for this
-                    stock?&rdquo;
-                  </li>
-                  <li>
-                    • &ldquo;Are there any catalysts that could move the
-                    price?&rdquo;
-                  </li>
-                  <li>• &ldquo;What do the top liked tweets suggest?&rdquo;</li>
-                  <li>
-                    • &ldquo;Is this a good entry point based on
-                    sentiment?&rdquo;
-                  </li>
-                </ul>
+            <p className="text-gray-400 mb-8 font-light">
+              {selectedStock
+                ? `How can I help you analyze ${selectedStock} today?`
+                : "Simply pick a stock first and ask questions"}
+            </p>
+
+            {/* Suggested Prompts */}
+            {suggestedPrompts.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {suggestedPrompts.map((prompt, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setInputMessage(prompt);
+                      setTimeout(() => sendMessage(), 100);
+                    }}
+                    className="p-4 bg-gray-800 rounded-lg text-left hover:bg-gray-700 transition-colors text-sm font-light"
+                  >
+                    {prompt}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -182,7 +188,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                   className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                     message.role === "user"
                       ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      : "bg-gray-700 text-white"
                   }`}
                 >
                   {message.role === "user" ? (
@@ -195,76 +201,84 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                   className={`rounded-lg px-4 py-2 ${
                     message.role === "user"
                       ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-gray-900"
+                      : "bg-gray-800 text-white"
                   }`}
                 >
                   {message.role === "user" ? (
-                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    <div className="whitespace-pre-wrap font-light">
+                      {message.content}
+                    </div>
                   ) : (
-                    <div className="prose prose-sm max-w-none">
+                    <div className="prose prose-sm prose-invert max-w-none">
                       <ReactMarkdown
                         components={{
                           h1: ({ children }) => (
-                            <h1 className="text-lg font-bold mb-2">
+                            <h1 className="text-lg font-semibold mb-2 text-white tracking-tight">
                               {children}
                             </h1>
                           ),
                           h2: ({ children }) => (
-                            <h2 className="text-base font-semibold mb-2 mt-3">
+                            <h2 className="text-base font-medium mb-2 mt-3 text-white tracking-tight">
                               {children}
                             </h2>
                           ),
                           h3: ({ children }) => (
-                            <h3 className="text-sm font-semibold mb-1 mt-2">
+                            <h3 className="text-sm font-medium mb-1 mt-2 text-white tracking-tight">
                               {children}
                             </h3>
                           ),
                           h4: ({ children }) => (
-                            <h4 className="text-sm font-medium mb-1 mt-2">
+                            <h4 className="text-sm font-normal mb-1 mt-2 text-white tracking-tight">
                               {children}
                             </h4>
                           ),
                           h5: ({ children }) => (
-                            <h5 className="text-sm font-medium mb-1">
+                            <h5 className="text-sm font-normal mb-1 text-white tracking-tight">
                               {children}
                             </h5>
                           ),
                           h6: ({ children }) => (
-                            <h6 className="text-sm font-medium mb-1">
+                            <h6 className="text-sm font-normal mb-1 text-white tracking-tight">
                               {children}
                             </h6>
                           ),
                           p: ({ children }) => (
-                            <p className="mb-2">{children}</p>
+                            <p className="mb-2 text-white font-light leading-relaxed">
+                              {children}
+                            </p>
                           ),
                           ul: ({ children }) => (
-                            <ul className="list-disc list-inside mb-2 space-y-1">
+                            <ul className="list-disc list-inside mb-2 space-y-1 text-white font-light">
                               {children}
                             </ul>
                           ),
                           ol: ({ children }) => (
-                            <ol className="list-decimal list-inside mb-2 space-y-1">
+                            <ol className="list-decimal list-inside mb-2 space-y-1 text-white font-light">
                               {children}
                             </ol>
                           ),
                           li: ({ children }) => (
-                            <li className="text-sm">{children}</li>
+                            <li className="text-sm text-white font-light">
+                              {children}
+                            </li>
                           ),
                           strong: ({ children }) => (
-                            <strong className="font-semibold">
+                            <strong className="font-medium text-white">
                               {children}
                             </strong>
                           ),
                           em: ({ children }) => (
-                            <em className="italic">{children}</em>
+                            <em className="italic text-white font-light">
+                              {children}
+                            </em>
                           ),
                           code: ({ children }) => (
-                            <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono">
+                            <code className="bg-gray-700 px-1 py-0.5 rounded text-xs font-mono text-white">
                               {children}
                             </code>
                           ),
                           blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600">
+                            <blockquote className="border-l-4 border-gray-600 pl-4 italic text-gray-300 font-light">
                               {children}
                             </blockquote>
                           ),
@@ -277,9 +291,9 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
                   <div
                     className={`text-xs mt-1 ${
                       message.role === "user"
-                        ? "text-blue-100"
-                        : "text-gray-500"
-                    }`}
+                        ? "text-blue-200"
+                        : "text-gray-400"
+                    } font-light`}
                   >
                     {formatTime(message.timestamp)}
                   </div>
@@ -291,14 +305,16 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center">
-                <Bot className="w-4 h-4" />
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
+                <Twitter className="w-4 h-4" />
               </div>
-              <div className="bg-gray-100 rounded-lg px-4 py-2">
+              <div className="bg-gray-800 rounded-lg px-4 py-2">
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                  <span className="text-gray-600">
-                    Analyzing Twitter sentiment...
+                  <div className="animate-pulse text-blue-400 text-lg">
+                    {analysisSteps[analysisStep].icon}
+                  </div>
+                  <span className="text-gray-300 font-light">
+                    {analysisSteps[analysisStep].text}
                   </span>
                 </div>
               </div>
@@ -309,26 +325,21 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-200 p-4 bg-white">
-        <div className="flex space-x-2">
-          <textarea
+      <div className="border-t border-gray-800 p-4 bg-black">
+        <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-3 py-2">
+          <Mic className="w-4 h-4 text-gray-400" />
+          <input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={
-              selectedStock
-                ? `Ask me about ${selectedStock} Twitter sentiment...`
-                : "Please select a stock first..."
-            }
+            placeholder="Send a message..."
             disabled={!selectedStock || isLoading}
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            rows={1}
-            style={{ minHeight: "44px", maxHeight: "120px" }}
+            className="flex-1 bg-transparent text-white placeholder-gray-400 focus:outline-none disabled:cursor-not-allowed font-light"
           />
           <button
             onClick={sendMessage}
             disabled={!inputMessage.trim() || !selectedStock || isLoading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
           >
             <Send className="w-4 h-4" />
           </button>
