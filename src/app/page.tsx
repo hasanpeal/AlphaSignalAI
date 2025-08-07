@@ -3,7 +3,7 @@
 import { useState } from "react";
 import StockSearch from "@/components/StockSearch";
 import ChatInterface from "@/components/ChatInterface";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Mail } from "lucide-react";
 
 export default function Home() {
   const [selectedStock, setSelectedStock] = useState<string>("");
@@ -12,6 +12,10 @@ export default function Home() {
   const handleNewChat = () => {
     setSelectedStock("");
     setResetKey((prev) => prev + 1); // Force ChatInterface to completely reset
+  };
+
+  const handleContactUs = () => {
+    window.open("mailto:Jeremy@shoykhet.co", "_blank");
   };
 
   return (
@@ -28,16 +32,28 @@ export default function Home() {
           </h1>
         </div>
 
-        {/* Right side - New Chat button (only show when stock is selected) */}
-        {selectedStock && (
-          <button
-            onClick={handleNewChat}
-            className="flex items-center space-x-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span className="cursor-pointer">New Chat</span>
-          </button>
-        )}
+        {/* Right side - Contact Us and New Chat buttons */}
+        <div className="flex items-center space-x-2">
+          {!selectedStock && (
+            <button
+              onClick={handleContactUs}
+              className="flex items-center space-x-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
+            >
+              <Mail className="w-4 h-4" />
+              <span className="cursor-pointer">Contact Us</span>
+            </button>
+          )}
+
+          {selectedStock && (
+            <button
+              onClick={handleNewChat}
+              className="flex items-center space-x-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span className="cursor-pointer">New Chat</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Chat Interface - Full Screen */}
