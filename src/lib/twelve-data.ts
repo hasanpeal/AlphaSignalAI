@@ -240,20 +240,27 @@ class TwelveDataAPI {
       // Filter for NASDAQ stocks only and remove duplicates
       const seenSymbols = new Set<string>();
       const filteredResults = allResults
-        .filter((item: any) => {
-          // Only include NASDAQ stocks
-          const isNasdaq = item.exchange === "NASDAQ";
+        .filter(
+          (item: {
+            symbol: string;
+            exchange: string;
+            name: string;
+            type: string;
+          }) => {
+            // Only include NASDAQ stocks
+            const isNasdaq = item.exchange === "NASDAQ";
 
-          // Check if we've already seen this symbol
-          const isDuplicate = seenSymbols.has(item.symbol);
+            // Check if we've already seen this symbol
+            const isDuplicate = seenSymbols.has(item.symbol);
 
-          if (isNasdaq && !isDuplicate) {
-            seenSymbols.add(item.symbol);
-            return true;
+            if (isNasdaq && !isDuplicate) {
+              seenSymbols.add(item.symbol);
+              return true;
+            }
+
+            return false;
           }
-
-          return false;
-        })
+        )
         .slice(0, 10); // Limit to top 10 results
 
       console.log(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, RefreshCw, Mic, Twitter } from "lucide-react";
+import { Send, Bot, User} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -51,7 +51,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
     } else {
       setAnalysisStep(0);
     }
-  }, [isLoading]);
+  }, [isLoading, analysisSteps.length]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -119,11 +119,6 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-    setSessionId(""); // Clear session when clearing chat
   };
 
   const formatTime = (date: Date) => {
@@ -309,7 +304,7 @@ export default function ChatInterface({ selectedStock }: ChatInterfaceProps) {
           <div className="flex justify-start">
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
-                <Twitter className="w-4 h-4" />
+                <Bot className="w-4 h-4" />
               </div>
               <div className="bg-gray-800 rounded-lg px-4 py-2">
                 <div className="flex items-center space-x-2">
