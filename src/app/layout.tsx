@@ -73,30 +73,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      {
-        url: "/alpha_signal_favicon.ico",
-        sizes: "any",
-        type: "image/x-icon",
-      },
-      {
-        url: "/icons8-stock-market-cloud-16.png",
-        sizes: "16x16",
-        type: "image/png",
-      },
-      {
-        url: "/icons8-stock-market-cloud-32.png",
-        sizes: "32x32",
-        type: "image/png",
-      },
-      {
-        url: "/icons8-stock-market-cloud-96.png",
-        sizes: "96x96",
-        type: "image/png",
-      },
-    ],
+    icon: "/alpha_signal_favicon.ico",
     shortcut: "/alpha_signal_favicon.ico",
-    apple: "/icons8-stock-market-cloud-96.png",
+    apple: "/alpha_signal_favicon.ico",
   },
 };
 
