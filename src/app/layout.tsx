@@ -45,12 +45,21 @@ export const metadata: Metadata = {
     url: "https://alpha-signal.xyz",
     siteName: "AlphaSignalAI",
     type: "website",
+    images: [
+      {
+        url: "/icons8-stock-market-cloud-96.png",
+        width: 96,
+        height: 96,
+        alt: "AlphaSignalAI Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AlphaSignalAI - AI-Powered Stock Analysis",
     description:
       "Get real-time stock analysis with AI-powered insights. Analyze stocks using Twitter data and comprehensive market analysis.",
+    images: ["/icons8-stock-market-cloud-96.png"],
   },
   robots: {
     index: true,
@@ -70,9 +79,24 @@ export const metadata: Metadata = {
         sizes: "any",
         type: "image/x-icon",
       },
+      {
+        url: "/icons8-stock-market-cloud-16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/icons8-stock-market-cloud-32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/icons8-stock-market-cloud-96.png",
+        sizes: "96x96",
+        type: "image/png",
+      },
     ],
     shortcut: "/alpha_signal_favicon.ico",
-    apple: "/alpha_signal_favicon.ico",
+    apple: "/icons8-stock-market-cloud-96.png",
   },
 };
 
@@ -125,6 +149,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
