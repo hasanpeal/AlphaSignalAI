@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/api/",
     },
-    sitemap: "https://stock-pilot.vercel.app/sitemap.xml",
+    sitemap: "https://alpha-signal.xyz/sitemap.xml",
   };
 }
